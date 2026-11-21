@@ -1,0 +1,562 @@
+/* GothamOS Tactical Presentation Sections
+ * Built on Echo UI's tactile material tokens (--echo-*) with Gotham obsidian + yellow (#facc15).
+ */
+
+.gotham-sec {
+  position: relative;
+  padding-block: clamp(4.5rem, 9vh, 7.5rem);
+  scroll-margin-top: 5rem;
+}
+
+.gotham-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.3rem 0.75rem;
+  border-radius: 999px;
+  border: 1px solid color-mix(in oklab, var(--echo-accent) 42%, var(--echo-border));
+  background: color-mix(in oklab, var(--echo-accent) 12%, var(--echo-surface));
+  color: var(--echo-accent);
+  font-family: var(--echo-font-mono);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 1rem;
+}
+
+.gotham-kicker__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--echo-accent);
+  box-shadow: 0 0 10px var(--echo-accent);
+}
+
+.gotham-card {
+  position: relative;
+  border-radius: 1.25rem;
+  border: 1px solid color-mix(in oklab, var(--echo-accent) 22%, var(--echo-border));
+  background: linear-gradient(
+    165deg,
+    color-mix(in oklab, var(--echo-surface) 96%, #14161d),
+    color-mix(in oklab, var(--echo-well) 96%, #08090c)
+  );
+  box-shadow:
+    0 24px 60px rgba(0, 0, 0, 0.48),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  overflow: hidden;
+}
+
+/* --- Squads Selector & 21st.dev-inspired Agent Plan Tree --- */
+
+.gotham-squad-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.gotham-squad-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(0, 0.9fr);
+  gap: 1.25rem;
+  align-items: start;
+}
+
+.gotham-plan {
+  padding: 1.25rem;
+}
+
+.gotham-plan__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  padding-bottom: 1rem;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid var(--echo-border);
+}
+
+.gotham-plan__title {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--echo-text);
+}
+
+.gotham-plan__sub {
+  margin: 0.25rem 0 0;
+  font-size: 0.84rem;
+  color: var(--echo-text-muted);
+}
+
+.gotham-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.22rem 0.6rem;
+  border-radius: 6px;
+  font-family: var(--echo-font-mono);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  border: 1px solid var(--echo-border);
+  background: color-mix(in oklab, var(--echo-well) 85%, transparent);
+  color: var(--echo-text-muted);
+}
+
+.gotham-pill--ok {
+  border-color: rgba(52, 211, 153, 0.38);
+  background: rgba(16, 185, 129, 0.14);
+  color: #34d399;
+}
+
+.gotham-pill--run {
+  border-color: color-mix(in oklab, var(--echo-accent) 48%, transparent);
+  background: color-mix(in oklab, var(--echo-accent) 16%, transparent);
+  color: var(--echo-accent);
+}
+
+.gotham-pill--warn {
+  border-color: rgba(251, 146, 60, 0.45);
+  background: rgba(249, 115, 22, 0.14);
+  color: #fb923c;
+}
+
+.gotham-task-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.65rem;
+}
+
+.gotham-task {
+  border-radius: 0.85rem;
+  border: 1px solid var(--echo-border);
+  background: color-mix(in oklab, var(--echo-well) 70%, transparent);
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.gotham-task--open {
+  border-color: color-mix(in oklab, var(--echo-accent) 42%, var(--echo-border));
+}
+
+.gotham-task__row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0.8rem 0.9rem;
+  background: transparent;
+  border: 0;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.gotham-task__status-btn {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  border: 1px solid var(--echo-border);
+  background: var(--echo-surface);
+  color: var(--echo-accent);
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.15s ease, border-color 0.15s ease;
+}
+
+.gotham-task__status-btn:hover {
+  transform: scale(1.08);
+  border-color: var(--echo-accent);
+}
+
+.gotham-task__status-btn--done {
+  background: rgba(16, 185, 129, 0.18);
+  border-color: rgba(52, 211, 153, 0.5);
+  color: #34d399;
+}
+
+.gotham-task__main {
+  flex: 1;
+  min-width: 0;
+}
+
+.gotham-task__name {
+  display: block;
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--echo-text);
+}
+
+.gotham-task__name--done {
+  text-decoration: line-through;
+  opacity: 0.65;
+}
+
+.gotham-task__desc {
+  display: block;
+  margin-top: 0.18rem;
+  font-size: 0.78rem;
+  color: var(--echo-text-muted);
+}
+
+.gotham-subtasks {
+  position: relative;
+  margin: 0 0.9rem 0.9rem 1.75rem;
+  padding: 0.5rem 0 0 1.1rem;
+  border-left: 1.5px dashed color-mix(in oklab, var(--echo-accent) 36%, var(--echo-border));
+  list-style: none;
+  display: grid;
+  gap: 0.65rem;
+}
+
+.gotham-subtask {
+  display: grid;
+  gap: 0.35rem;
+  padding: 0.65rem 0.75rem;
+  border-radius: 0.65rem;
+  background: color-mix(in oklab, var(--echo-surface) 82%, transparent);
+  border: 1px solid color-mix(in oklab, var(--echo-border) 80%, transparent);
+}
+
+.gotham-subtask__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.gotham-subtask__title {
+  font-size: 0.83rem;
+  font-weight: 600;
+  color: var(--echo-text);
+}
+
+.gotham-subtask__detail {
+  margin: 0;
+  font-size: 0.76rem;
+  line-height: 1.45;
+  color: var(--echo-text-muted);
+}
+
+.gotham-tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-top: 0.15rem;
+}
+
+.gotham-tool {
+  font-family: var(--echo-font-mono);
+  font-size: 0.68rem;
+  padding: 0.15rem 0.48rem;
+  border-radius: 5px;
+  border: 1px solid color-mix(in oklab, var(--echo-accent) 26%, var(--echo-border));
+  background: color-mix(in oklab, var(--echo-well) 90%, transparent);
+  color: var(--echo-accent);
+}
+
+/* --- Side Executive Dossier --- */
+
+.gotham-dossier {
+  padding: 1.25rem;
+  display: grid;
+  gap: 1.1rem;
+}
+
+.gotham-kpis {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.65rem;
+}
+
+.gotham-kpi {
+  padding: 0.8rem 0.85rem;
+  border-radius: 0.75rem;
+  border: 1px solid var(--echo-border);
+  background: color-mix(in oklab, var(--echo-well) 78%, transparent);
+}
+
+.gotham-kpi small {
+  display: block;
+  font-family: var(--echo-font-mono);
+  font-size: 0.67rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--echo-text-muted);
+}
+
+.gotham-kpi strong {
+  display: block;
+  margin-top: 0.28rem;
+  font-family: var(--echo-font-mono);
+  font-size: 1.22rem;
+  font-weight: 700;
+  color: var(--echo-accent);
+}
+
+.gotham-kpi span {
+  display: block;
+  margin-top: 0.15rem;
+  font-size: 0.73rem;
+  color: var(--echo-text-muted);
+}
+
+.gotham-verdict {
+  padding: 0.95rem 1rem;
+  border-radius: 0.8rem;
+  border-left: 3px solid var(--echo-accent);
+  background: color-mix(in oklab, var(--echo-accent) 8%, var(--echo-well));
+}
+
+.gotham-verdict small {
+  display: block;
+  font-family: var(--echo-font-mono);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  color: var(--echo-accent);
+  margin-bottom: 0.35rem;
+}
+
+.gotham-verdict p {
+  margin: 0;
+  font-size: 0.85rem;
+  line-height: 1.55;
+  color: var(--echo-text);
+}
+
+/* --- Dual-Mode Architecture & 21st.dev-inspired Deploy Pipeline --- */
+
+.gotham-mode-switch {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.gotham-mode-btns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.gotham-pipeline-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.9rem;
+  margin-bottom: 1.25rem;
+}
+
+.gotham-stage {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  padding: 1.05rem;
+  border-radius: 1rem;
+  border: 1px solid var(--echo-border);
+  background: color-mix(in oklab, var(--echo-well) 75%, transparent);
+  text-align: left;
+  cursor: pointer;
+  color: inherit;
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.gotham-stage:hover {
+  transform: translateY(-2px);
+  border-color: color-mix(in oklab, var(--echo-accent) 55%, var(--echo-border));
+}
+
+.gotham-stage--active {
+  border-color: var(--echo-accent);
+  background: color-mix(in oklab, var(--echo-accent) 10%, var(--echo-surface));
+  box-shadow: 0 12px 32px color-mix(in oklab, var(--echo-accent) 16%, transparent);
+}
+
+.gotham-stage__num {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-family: var(--echo-font-mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--echo-accent);
+}
+
+.gotham-stage__title {
+  margin: 0;
+  font-size: 0.96rem;
+  font-weight: 600;
+  color: var(--echo-text);
+}
+
+.gotham-stage__desc {
+  margin: 0;
+  font-size: 0.8rem;
+  line-height: 1.48;
+  color: var(--echo-text-muted);
+}
+
+.gotham-deploy-detail {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+  gap: 1.25rem;
+  padding: 1.35rem;
+}
+
+.gotham-specs {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.7rem;
+  margin-top: 1rem;
+}
+
+.gotham-spec {
+  padding: 0.75rem 0.85rem;
+  border-radius: 0.75rem;
+  border: 1px solid var(--echo-border);
+  background: color-mix(in oklab, var(--echo-well) 72%, transparent);
+}
+
+.gotham-spec small {
+  display: block;
+  font-family: var(--echo-font-mono);
+  font-size: 0.66rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--echo-accent);
+}
+
+.gotham-spec strong {
+  display: block;
+  margin-top: 0.25rem;
+  font-size: 0.86rem;
+  color: var(--echo-text);
+}
+
+.gotham-spec span {
+  display: block;
+  margin-top: 0.15rem;
+  font-size: 0.76rem;
+  color: var(--echo-text-muted);
+}
+
+.gotham-terminal {
+  border-radius: 0.9rem;
+  border: 1px solid color-mix(in oklab, var(--echo-accent) 28%, var(--echo-border));
+  background: #07080b;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.gotham-terminal__bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.6rem 0.9rem;
+  background: #101218;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  font-family: var(--echo-font-mono);
+  font-size: 0.72rem;
+  color: #9ba3b4;
+}
+
+.gotham-terminal__body {
+  padding: 1rem;
+  margin: 0;
+  font-family: var(--echo-font-mono);
+  font-size: 0.77rem;
+  line-height: 1.65;
+  color: #e5e7eb;
+  overflow-x: auto;
+  flex: 1;
+}
+
+.gotham-terminal__prompt {
+  color: #facc15;
+  font-weight: 700;
+}
+
+.gotham-terminal__ok {
+  color: #34d399;
+}
+
+.gotham-terminal__dim {
+  color: #8b95a7;
+}
+
+.gotham-offer-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.25rem;
+  margin-top: 1.5rem;
+}
+
+.gotham-offer-card {
+  padding: 1.4rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.gotham-offer-card h3 {
+  margin: 0.35rem 0 0.5rem;
+  font-size: 1.25rem;
+  color: var(--echo-text);
+}
+
+.gotham-offer-card p {
+  margin: 0;
+  font-size: 0.88rem;
+  line-height: 1.55;
+  color: var(--echo-text-muted);
+}
+
+.gotham-offer-list {
+  list-style: none;
+  margin: 0.85rem 0 0;
+  padding: 0;
+  display: grid;
+  gap: 0.45rem;
+  font-size: 0.84rem;
+  color: var(--echo-text);
+}
+
+.gotham-offer-list li::before {
+  content: "▸ ";
+  color: var(--echo-accent);
+  font-weight: 700;
+}
+
+@media (max-width: 960px) {
+  .gotham-squad-grid,
+  .gotham-deploy-detail,
+  .gotham-offer-grid {
+    grid-template-columns: 1fr;
+  }
+  .gotham-pipeline-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 580px) {
+  .gotham-pipeline-grid,
+  .gotham-specs,
+  .gotham-kpis {
+    grid-template-columns: 1fr;
+  }
+}
