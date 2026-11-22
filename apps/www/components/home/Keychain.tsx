@@ -86,7 +86,7 @@ export function Keychain() {
       <button
         type="button"
         className="keychain__button"
-        aria-label={home ? "Enviar Kirby para explorar" : "Chamar Kirby para a tela"}
+        aria-label={home ? "Enviar agente para explorar" : "Chamar agente para a tela"}
         {...cap.handlers}
         onClick={() => setCalled((c) => (c ? null : "you"))}
         tabIndex={atFoot ? -1 : undefined}

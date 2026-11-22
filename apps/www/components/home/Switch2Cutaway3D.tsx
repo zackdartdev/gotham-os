@@ -180,18 +180,18 @@ export function Switch2Cutaway3D({ away = false }: { away?: boolean }) {
       data-right-detached={rightDetached ? "true" : "false"}
       data-away={away ? "true" : "false"}
     >
-      <div className="sw2-viewport" aria-label="Nintendo Switch 2 interativo em 3D. Arraste para girar ou clique nos Joy-Cons para destacar.">
+      <div className="sw2-viewport" aria-label="Console tátil GothamOS interativo em 3D. Arraste para girar ou clique nos módulos laterais para destacar.">
         <div className="sw2-float">
           <div ref={rig} className="sw2-rig">
-            {/* SOLID 3D LEFT JOY-CON 2 (Magnetic Cyan) */}
+            {/* SOLID 3D LEFT MAGNETIC MODULE (Cyan) */}
             <button
               type="button"
               className="sw2-joycon sw2-joycon--left"
               data-detached={leftDetached ? "true" : "false"}
               onClick={() => setLeftDetached((v) => !v)}
               aria-pressed={leftDetached}
-              aria-label={leftDetached ? "Encaixar Joy-Con Esquerdo" : "Destacar Joy-Con Esquerdo"}
-              title="Clique para destacar/encaixar Joy-Con L"
+              aria-label={leftDetached ? "Encaixar módulo esquerdo" : "Destacar módulo esquerdo"}
+              title="Clique para destacar/encaixar módulo esquerdo"
             >
               {/* Solid 3D Walls */}
               <span className="sw2-jc-wall sw2-jc-wall--outer" aria-hidden="true" />
@@ -279,8 +279,8 @@ export function Switch2Cutaway3D({ away = false }: { away?: boolean }) {
 
               {/* Layer 3: Solid Rear Graphite Shell & U-Kickstand */}
               <div className="sw2-tablet__back" aria-hidden="true">
-                <span className="sw2-back-logo">SWITCH 2</span>
-                <span className="sw2-back-sub">KIRBY EDITION · CUTAWAY 3D</span>
+                <span className="sw2-back-logo">GOTHAM CORE</span>
+                <span className="sw2-back-sub">MÓDULO TÁTIL · CUTAWAY 3D</span>
                 <span className="sw2-kickstand" />
               </div>
 
@@ -351,7 +351,7 @@ export function Switch2Cutaway3D({ away = false }: { away?: boolean }) {
                       <span className="sw2-hud-dot" />
                       GOTHAM OS
                     </span>
-                    <span>{cutaway ? "CUTAWAY 3D" : bothDetached ? "JOY-CONS SOLTOS" : "SWITCH 2 · 120Hz"}</span>
+                    <span>{cutaway ? "CUTAWAY 3D" : bothDetached ? "MÓDULOS SOLTOS" : "CORE · 120Hz"}</span>
                   </div>
 
                   <div className="sw2-screen__creature">
@@ -361,7 +361,7 @@ export function Switch2Cutaway3D({ away = false }: { away?: boolean }) {
                   </div>
 
                   <div className="sw2-screen__brb" aria-hidden="true">
-                    KIRBY EM CAMPO
+                    SENTINEL EM CAMPO
                   </div>
 
                   <div className="sw2-hud-bot" aria-hidden="true">
@@ -381,15 +381,15 @@ export function Switch2Cutaway3D({ away = false }: { away?: boolean }) {
               </div>
             </div>
 
-            {/* SOLID 3D RIGHT JOY-CON 2 (Magnetic Coral) */}
+            {/* SOLID 3D RIGHT MAGNETIC MODULE (Coral) */}
             <button
               type="button"
               className="sw2-joycon sw2-joycon--right"
               data-detached={rightDetached ? "true" : "false"}
               onClick={() => setRightDetached((v) => !v)}
               aria-pressed={rightDetached}
-              aria-label={rightDetached ? "Encaixar Joy-Con Direito" : "Destacar Joy-Con Direito"}
-              title="Clique para destacar/encaixar Joy-Con R"
+              aria-label={rightDetached ? "Encaixar módulo direito" : "Destacar módulo direito"}
+              title="Clique para destacar/encaixar módulo direito"
             >
               {/* Solid 3D Walls */}
               <span className="sw2-jc-wall sw2-jc-wall--outer" aria-hidden="true" />
@@ -433,18 +433,18 @@ export function Switch2Cutaway3D({ away = false }: { away?: boolean }) {
         <div ref={shadow} className="sw2-shadow" aria-hidden="true" />
       </div>
 
-      {/* Interactive Cutaway 3D & Joy-Con Controls */}
-      <div className="sw2-controls" role="group" aria-label="Controles do Nintendo Switch 2 3D">
+      {/* Interactive Cutaway 3D & Magnetic Module Controls */}
+      <div className="sw2-controls" role="group" aria-label="Controles do console 3D GothamOS">
         <button type="button" className="sw2-ctrl" aria-pressed={bothDetached} onClick={toggleBothJoyCons}>
           <span className="sw2-ctrl__dot sw2-ctrl__dot--cyan" aria-hidden="true" />
-          {bothDetached ? "Encaixar Joy-Cons" : "Destacar Joy-Cons"}
+          {bothDetached ? "Encaixar Módulos" : "Destacar Módulos"}
         </button>
         <button type="button" className="sw2-ctrl" aria-pressed={cutaway} onClick={() => setCutaway((v) => !v)}>
           <span className="sw2-ctrl__dot" aria-hidden="true" />
           {cutaway ? "Fechar Cutaway 3D" : "Abrir Cutaway 3D"}
         </button>
         <button type="button" className="sw2-ctrl" aria-pressed={!awake} onClick={() => setAwake((v) => !v)}>
-          {awake ? "Kirby: Acordado" : "Kirby: Soneca"}
+          {awake ? "Sentinel: Ativo" : "Sentinel: Standby"}
         </button>
       </div>
     </div>
