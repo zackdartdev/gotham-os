@@ -43,13 +43,9 @@ const listeners = new Set<() => void>();
 function readChoice() {
   current = echo = null;
   try {
-    const v = JSON.parse(window.localStorage.getItem(STORAGE_KEY) ?? "null") as { seed?: unknown; echo?: unknown } | null;
-    if (v && isSeed(v.seed)) {
-      current = v.seed;
-      if (isSeed(v.echo)) echo = v.echo;
-    }
+    window.localStorage.removeItem(STORAGE_KEY);
   } catch {
-    /* storage blocked or corrupt — no choice, then */
+    /* storage blocked */
   }
 }
 

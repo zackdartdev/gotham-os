@@ -21,7 +21,6 @@ import { usePathname } from "next/navigation";
 import { HardwareButton } from "@registry/echo/hardware-button";
 import { TOP_NAV, type NavLink } from "@/components/site/site-nav";
 import { Flower } from "@/components/brand/Logo";
-import { DeviceSwitch } from "@/components/site/DeviceSwitch";
 import type { Seed } from "@/components/site/seeds";
 import "./site-shell.css";
 
@@ -66,8 +65,7 @@ export function TopNavLinks({
           {link.label}
         </Link>
       ))}
-      {/* Echo's two devices, at a press: light plastic or dark, the same accent. Or the page's own tools. */}
-      {tools ?? <DeviceSwitch opening={opening} />}
+      {tools}
       <span className="echo-topnav__key">
         <HardwareButton size="sm" variant="primary" href="/#contato">
           Agendar Implantação

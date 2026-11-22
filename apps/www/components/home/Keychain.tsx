@@ -17,7 +17,7 @@
  */
 import { useEffect, useRef, useState } from "react";
 import { useCapPhysics } from "echo-ui-core/tactile";
-import { Creature } from "@registry/echo/creature";
+import { Creature } from "@/components/brand/Creature";
 
 const NAP_AFTER = 30_000;
 
@@ -86,7 +86,7 @@ export function Keychain() {
       <button
         type="button"
         className="keychain__button"
-        aria-label={home ? "Send Echo out" : "Call Echo home"}
+        aria-label={home ? "Enviar Kirby para explorar" : "Chamar Kirby para a tela"}
         {...cap.handlers}
         onClick={() => setCalled((c) => (c ? null : "you"))}
         tabIndex={atFoot ? -1 : undefined}
@@ -94,7 +94,7 @@ export function Keychain() {
         <span className="keychain__body" ref={cap.ref}>
           <span className="keychain__screen" data-echo-dock-screen="">
             {docked ? (
-              <Creature size={30} mood={called === "nap" ? "sleep" : "idle"} />
+              <Creature size={30} mood={called === "nap" ? "resting" : "watching"} interactive={false} />
             ) : (
               <span className="keychain__lcd" aria-hidden="true">
                 {home ? "…" : "OUT"}

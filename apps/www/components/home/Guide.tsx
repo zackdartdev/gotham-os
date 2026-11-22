@@ -24,7 +24,8 @@
  * Without JavaScript it never leaves the device.
  */
 import { useEffect, useRef, useState, type CSSProperties } from "react";
-import { Creature, type CreatureMood } from "@registry/echo/creature";
+import { type CreatureMood } from "@registry/echo/creature";
+import { Creature } from "@/components/brand/Creature";
 
 /** The drawn size. Every perch is smaller, so a scaled Echo is only ever scaled down. */
 const SIZE = 188;
@@ -278,7 +279,7 @@ export function Guide({ onAwayChange }: { onAwayChange?: (away: boolean) => void
   return (
     <div ref={outer} className="home-guide" aria-hidden="true">
       <div ref={inner} className="home-guide__lean">
-        <Creature mood={mood} size={SIZE} />
+        <Creature mood={mood === "sleep" ? "resting" : "watching"} size={SIZE} />
       </div>
     </div>
   );

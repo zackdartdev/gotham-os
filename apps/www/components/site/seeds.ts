@@ -25,12 +25,7 @@ export interface Seed {
  * would undo it, so picking one wears Echo's style.
  */
 export const SEED_PRESETS: readonly { name: string; seed: Seed }[] = [
-  { name: "Kirby", seed: { accent: "#FF6FAE", chassis: "#17121E", paper: "#FFF0F7" } },
-  { name: "Gotham", seed: { accent: "#FACC15", chassis: "#0D0E12", paper: "#F6F3E4" } },
-  { name: "Nawwara", seed: { accent: "#8B6FE8", chassis: "#232130", paper: "#EFEBFA" } },
-  { name: "Raspberry", seed: { accent: "#DE3B74", chassis: "#26222B", paper: "#F5EDE0" } },
-  { name: "Coral", seed: { accent: "#F2674E", chassis: "#2B2224", paper: "#F9ECE7" } },
-  { name: "Sky", seed: { accent: "#3D8EF0", chassis: "#1F2330", paper: "#E9F0FA" } },
+  { name: "Roxo", seed: { accent: "#8B6FE8", chassis: "#1B1726", paper: "#EFEBFA" } },
 ];
 
 export const DEFAULT_SEED: Seed = SEED_PRESETS[0]!.seed;

@@ -143,25 +143,40 @@ export function Flower({
       )}
       <svg viewBox={VIEWBOX} width={box} height={box} style={{ overflow: "visible", position: "relative" }}>
         <defs>
-          <radialGradient id={uid} cx="38%" cy="30%" r="80%">
-            <stop offset="0%" style={{ stopColor: creature.bodyLight }} />
-            <stop offset="40%" style={{ stopColor: creature.body }} />
-            <stop offset="100%" style={{ stopColor: creature.bodyDeep }} />
+          <radialGradient id={uid} cx="36%" cy="28%" r="74%">
+            <stop offset="0%" stopColor="#ffd1e8" />
+            <stop offset="45%" stopColor="#ff85bf" />
+            <stop offset="100%" stopColor="#e2498d" />
           </radialGradient>
         </defs>
-        {/* Named for a drawn look (brand.css), like the creature's own drawing. */}
-        <path className="brand-creature__body" d={BODY} style={{ fill: bodyFill }} />
+        {/* Kirby Rosa atomic mark */}
+        <ellipse cx="118.5" cy="52.5" rx="9.8" ry="5.8" transform="rotate(-14 118.5 52.5)" fill={mono ? bodyFill : "#d91b4c"} />
+        <ellipse cx="141.5" cy="52.5" rx="9.8" ry="5.8" transform="rotate(14 141.5 52.5)" fill={mono ? bodyFill : "#d91b4c"} />
+        <ellipse cx="108" cy="34.8" rx="6.8" ry="4.8" transform="rotate(-24 108 34.8)" fill={mono ? bodyFill : `url(#${uid})`} />
+        <ellipse cx="152" cy="34.8" rx="6.8" ry="4.8" transform="rotate(24 152 34.8)" fill={mono ? bodyFill : `url(#${uid})`} />
+        <circle className="brand-creature__body" cx="130" cy="33.5" r="21.5" fill={mono ? bodyFill : `url(#${uid})`} />
         {gloss && (
-          <ellipse className="brand-creature__shine" cx="125" cy="20" rx="5.4" ry="3.4" fill="rgba(255,255,255,0.55)" transform="rotate(-18 125 20)" />
+          <ellipse className="brand-creature__shine" cx="122" cy="21.5" rx="6.8" ry="3.8" fill="rgba(255,255,255,0.62)" transform="rotate(-20 122 21.5)" />
+        )}
+        {!mono && (
+          <>
+            <ellipse cx="116.5" cy="36.2" rx="4.0" ry="2.1" fill="#ff3b82" opacity="0.68" />
+            <ellipse cx="143.5" cy="36.2" rx="4.0" ry="2.1" fill="#ff3b82" opacity="0.68" />
+          </>
         )}
         {showEyes && (
           <g>
-            <path className="brand-creature__eye" d={EYE_WHITE_L} style={{ fill: eyeFill }} />
-            <path className="brand-creature__eye" d={EYE_WHITE_R} style={{ fill: eyeFill }} />
-            <path className="brand-creature__pupil" d={PUPIL_L} style={{ fill: pupilFill }} />
-            <path className="brand-creature__pupil" d={PUPIL_R} style={{ fill: pupilFill }} />
-            {gloss &&
-              EYE_CATCH.map(([x, y]) => <circle key={x} className="brand-creature__shine" cx={x} cy={y} r={0.55} fill="rgba(255,255,255,0.8)" />)}
+            <ellipse cx="123.4" cy="29.8" rx="3.0" ry="6.0" fill={mono ? pupilFill : "#0b0d17"} />
+            <ellipse cx="136.6" cy="29.8" rx="3.0" ry="6.0" fill={mono ? pupilFill : "#0b0d17"} />
+            {!mono && (
+              <>
+                <ellipse cx="123.4" cy="32.1" rx="2.0" ry="3.0" fill="#2563eb" />
+                <ellipse cx="136.6" cy="32.1" rx="2.0" ry="3.0" fill="#2563eb" />
+                <ellipse cx="123.4" cy="26.8" rx="1.6" ry="2.4" fill="#ffffff" />
+                <ellipse cx="136.6" cy="26.8" rx="1.6" ry="2.4" fill="#ffffff" />
+                <path d="M126.8 37.6 Q130 41.2 133.2 37.6" fill="none" stroke="#7a0a29" strokeWidth="1.25" strokeLinecap="round" />
+              </>
+            )}
           </g>
         )}
       </svg>

@@ -234,7 +234,7 @@ export function DeviceSpinner({
           ))}
           <span className="spin__back" aria-hidden="true">
             <span className="spin__screw" />
-            <span className="spin__plate">echo</span>
+            <span className="spin__plate">gotham</span>
             <span className="spin__screw" />
           </span>
           <div className="spin__face">{children}</div>

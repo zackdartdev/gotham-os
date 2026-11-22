@@ -19,6 +19,7 @@ import {
   MeshPhysicalMaterial,
   PlaneGeometry,
   SphereGeometry,
+  TorusGeometry,
   type BufferGeometry,
 } from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
@@ -105,6 +106,9 @@ export class Creature3D {
   private readonly outline: Mesh;
   private readonly kirbyArmL: Mesh;
   private readonly kirbyArmR: Mesh;
+  private readonly kirbyEyeL: Group;
+  private readonly kirbyEyeR: Group;
+  private readonly kirbyPupils: Group;
   private readonly heroParts: { dispose: () => void }[] = [];
   private target: MarbleColours;
 
@@ -134,75 +138,149 @@ export class Creature3D {
     this.scaleMap = model.map.scale;
     this.target = marbleColours(marble);
 
-    this.breath.add(new Mesh(model.body, material));
-    model.body.computeBoundingSphere();
-    const centre = model.body.boundingSphere!.center;
-    // Drawn first, as a flat silhouette that writes no depth, so the body covers all of it but the ring.
-    this.outline = new Mesh(model.body, new MeshBasicMaterial({ color: 0x050505, depthWrite: false }));
-    this.outline.renderOrder = -0.5;
-    this.outline.scale.setScalar(OUTLINE);
-    this.outline.position.copy(centre).multiplyScalar(1 - OUTLINE);
-    this.outline.visible = false;
-    this.breath.add(this.outline);
-
-    // --- Kirby Rosa 3D Anatomy (Pink Stubby Arms, Big Crimson Feet, Blush Cheeks) ---
+    // --- Pure Sculptural 3D Kirby Rosa (matches the Switch 2 screen Kirby) ---
     const kirbyPinkMat = new MeshPhysicalMaterial({
-      color: 0xff82be,
+      color: 0xff85bf,
+      emissive: 0x3a0b24,
+      emissiveIntensity: 0.16,
       roughness: 0.28,
-      metalness: 0.04,
-      clearcoat: 0.75,
+      metalness: 0.03,
+      clearcoat: 0.78,
       clearcoatRoughness: 0.22,
     });
     const kirbyRedMat = new MeshPhysicalMaterial({
       color: 0xd91b4c,
-      roughness: 0.24,
-      metalness: 0.06,
-      clearcoat: 0.85,
-      clearcoatRoughness: 0.18,
+      emissive: 0x2a0511,
+      emissiveIntensity: 0.15,
+      roughness: 0.22,
+      metalness: 0.05,
+      clearcoat: 0.88,
+      clearcoatRoughness: 0.16,
     });
     const kirbyBlushMat = new MeshBasicMaterial({
       color: 0xff3b82,
       transparent: true,
       opacity: 0.72,
     });
-    this.heroParts.push(kirbyPinkMat, kirbyRedMat, kirbyBlushMat);
+    const eyeBlackMat = new MeshPhysicalMaterial({
+      color: 0x0b0d17,
+      roughness: 0.12,
+      clearcoat: 0.9,
+    });
+    const eyeBlueMat = new MeshBasicMaterial({ color: 0x2563eb });
+    const eyeWhiteMat = new MeshBasicMaterial({ color: 0xffffff });
+    const mouthMat = new MeshBasicMaterial({ color: 0x7a0a29 });
+    this.heroParts.push(kirbyPinkMat, kirbyRedMat, kirbyBlushMat, eyeBlackMat, eyeBlueMat, eyeWhiteMat, mouthMat);
+
+    // Smooth round pink Kirby sphere body
+    const bodyGeo = new SphereGeometry(0.9, 36, 28);
+    const bodyMesh = new Mesh(bodyGeo, kirbyPinkMat);
+    this.breath.add(bodyMesh);
+    this.heroParts.push(bodyGeo);
+
+    // Subtle ink outline sphere (hidden unless drawn mode)
+    this.outline = new Mesh(bodyGeo, new MeshBasicMaterial({ color: 0x050505, depthWrite: false }));
+    this.outline.renderOrder = -0.5;
+    this.outline.scale.setScalar(OUTLINE);
+    this.outline.visible = false;
+    this.breath.add(this.outline);
 
     // Stubby rosy pink arms
-    const armGeo = new SphereGeometry(0.26, 20, 16);
+    const armGeo = new SphereGeometry(0.28, 22, 16);
     this.kirbyArmL = new Mesh(armGeo, kirbyPinkMat);
     this.kirbyArmL.scale.set(1.15, 0.82, 0.88);
-    this.kirbyArmL.position.set(-0.92, -0.02, 0.08);
+    this.kirbyArmL.position.set(-0.92, -0.04, 0.08);
     this.kirbyArmL.rotation.z = -0.35;
 
     this.kirbyArmR = new Mesh(armGeo, kirbyPinkMat);
     this.kirbyArmR.scale.set(1.15, 0.82, 0.88);
-    this.kirbyArmR.position.set(0.92, -0.02, 0.08);
+    this.kirbyArmR.position.set(0.92, -0.04, 0.08);
     this.kirbyArmR.rotation.z = 0.35;
 
     // Big glossy crimson feet
-    const footGeo = new SphereGeometry(0.32, 22, 16);
+    const footGeo = new SphereGeometry(0.34, 24, 16);
     const footL = new Mesh(footGeo, kirbyRedMat);
-    footL.scale.set(1.22, 0.68, 1.48);
-    footL.position.set(-0.46, -0.84, 0.24);
+    footL.scale.set(1.22, 0.66, 1.48);
+    footL.position.set(-0.46, -0.82, 0.24);
     footL.rotation.y = 0.26;
 
     const footR = new Mesh(footGeo, kirbyRedMat);
-    footR.scale.set(1.22, 0.68, 1.48);
-    footR.position.set(0.46, -0.84, 0.24);
+    footR.scale.set(1.22, 0.66, 1.48);
+    footR.position.set(0.46, -0.82, 0.24);
     footR.rotation.y = -0.26;
 
     // Rosy oval blush cheeks on the front
     const blushGeo = new SphereGeometry(0.14, 16, 12);
     const blushL = new Mesh(blushGeo, kirbyBlushMat);
-    blushL.scale.set(1.35, 0.65, 0.25);
-    blushL.position.set(-0.48, -0.14, 0.56);
+    blushL.scale.set(1.38, 0.68, 0.25);
+    blushL.position.set(-0.48, -0.08, 0.74);
+    blushL.rotation.y = -0.45;
 
     const blushR = new Mesh(blushGeo, kirbyBlushMat);
-    blushR.scale.set(1.35, 0.65, 0.25);
-    blushR.position.set(0.48, -0.14, 0.56);
+    blushR.scale.set(1.38, 0.68, 0.25);
+    blushR.position.set(0.48, -0.08, 0.74);
+    blushR.rotation.y = 0.45;
 
-    this.heroParts.push(armGeo, footGeo, blushGeo);
-    this.breath.add(this.kirbyArmL, this.kirbyArmR, footL, footR, blushL, blushR);
+    // Iconic tall oval 3D Kirby eyes (black + blue lower iris + white upper shine)
+    const eyeGeo = new SphereGeometry(0.13, 18, 14);
+    const irisGeo = new SphereGeometry(0.085, 16, 12);
+    const shineGeo = new SphereGeometry(0.068, 14, 12);
+
+    const makeEye = (x: number, rotY: number) => {
+      const g = new Group();
+      g.position.set(x, 0.16, 0.84);
+      g.rotation.y = rotY;
+      const base = new Mesh(eyeGeo, eyeBlackMat);
+      base.scale.set(0.95, 1.95, 0.32);
+      g.add(base);
+      return g;
+    };
+
+    this.kirbyEyeL = makeEye(-0.24, -0.22);
+    this.kirbyEyeR = makeEye(0.24, 0.22);
+
+    this.kirbyPupils = new Group();
+    const irisL = new Mesh(irisGeo, eyeBlueMat);
+    irisL.scale.set(0.95, 1.45, 0.35);
+    irisL.position.set(-0.24, 0.06, 0.885);
+    irisL.rotation.y = -0.22;
+
+    const irisR = new Mesh(irisGeo, eyeBlueMat);
+    irisR.scale.set(0.95, 1.45, 0.35);
+    irisR.position.set(0.24, 0.06, 0.885);
+    irisR.rotation.y = 0.22;
+
+    const shineL = new Mesh(shineGeo, eyeWhiteMat);
+    shineL.scale.set(0.92, 1.38, 0.38);
+    shineL.position.set(-0.24, 0.27, 0.89);
+    shineL.rotation.y = -0.22;
+
+    const shineR = new Mesh(shineGeo, eyeWhiteMat);
+    shineR.scale.set(0.92, 1.38, 0.38);
+    shineR.position.set(0.24, 0.27, 0.89);
+    shineR.rotation.y = 0.22;
+
+    this.kirbyPupils.add(irisL, irisR, shineL, shineR);
+
+    // Cute curved Kirby smile
+    const smileGeo = new TorusGeometry(0.11, 0.026, 10, 20, Math.PI);
+    const smile = new Mesh(smileGeo, mouthMat);
+    smile.position.set(0, -0.1, 0.88);
+    smile.rotation.z = Math.PI;
+
+    this.heroParts.push(armGeo, footGeo, blushGeo, eyeGeo, irisGeo, shineGeo, smileGeo);
+    this.breath.add(
+      this.kirbyArmL,
+      this.kirbyArmR,
+      footL,
+      footR,
+      blushL,
+      blushR,
+      this.kirbyEyeL,
+      this.kirbyEyeR,
+      this.kirbyPupils,
+      smile,
+    );
 
     this.lift.add(this.breath);
     this.turn.add(this.lift);
@@ -358,12 +436,17 @@ export class Creature3D {
         if (b >= 0.19) this.blink = -1;
       }
     }
-    this.uniforms.uLids.value = Math.max(0.06, this.lids * blink);
+    const lidScale = Math.max(0.08, this.lids * blink);
+    this.uniforms.uLids.value = lidScale;
+    this.kirbyEyeL.scale.y = lidScale;
+    this.kirbyEyeR.scale.y = lidScale;
+    this.kirbyPupils.visible = lidScale > 0.25;
 
-    // The pupils slide across the whites: all the way right is the drawing as it is.
+    // The pupils slide gently across Kirby's eyes toward the pointer.
     const sx = LOOK.left + ((LOOK.right - LOOK.left) * (this.lookX + 1)) / 2;
     const sy = this.lookY >= 0 ? LOOK.up * this.lookY : LOOK.down * -this.lookY;
     this.uniforms.uLook.value.set(sx * this.scaleMap, -sy * this.scaleMap);
+    this.kirbyPupils.position.set(this.lookX * 0.032, this.lookY * 0.028, 0);
 
     const air = clamp((at.air ?? 0) + hopY * 1.2, 0, 1);
     (this.shadow.material as MeshBasicMaterial).opacity = 0.55 * (1 - air);

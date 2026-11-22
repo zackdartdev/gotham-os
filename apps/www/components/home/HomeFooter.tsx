@@ -21,25 +21,21 @@
  * column of thirty links a screen and a half long.
  */
 import { Fragment, type CSSProperties } from "react";
-import { Creature } from "@registry/echo/creature";
 import { Accordion } from "@registry/echo/accordion";
-import { FusedLockup } from "@/components/brand/Logo";
+import { Creature } from "@/components/brand/Creature";
+import { Flower } from "@/components/brand/Logo";
 import { GuideStop } from "@/components/home/Guide";
-import { SEED_PRESETS } from "@/components/site/theme-store";
-import { DeviceSwitch } from "@/components/site/DeviceSwitch";
-import { LANDING_SEED } from "@/components/home/landing-seed";
 import { FootLight } from "@/components/home/light/FootLight";
-import { HeapLine } from "@/components/supporters/HeapLine";
 
-/** The flat heap: sizes and colours that read as a crowd, not a row. */
+/** The flat heap: Kirby crowd fallback when WebGL is unavailable. */
 const FLAT = [
-  { size: 88, colour: undefined, lift: 0 },
-  { size: 64, colour: SEED_PRESETS[1]!.seed.accent, lift: 10 },
-  { size: 104, colour: SEED_PRESETS[3]!.seed.accent, lift: 0 },
-  { size: 72, colour: SEED_PRESETS[2]!.seed.accent, lift: 4 },
-  { size: 96, colour: undefined, lift: 0 },
-  { size: 60, colour: SEED_PRESETS[1]!.seed.accent, lift: 14 },
-  { size: 84, colour: SEED_PRESETS[3]!.seed.accent, lift: 2 },
+  { size: 88, lift: 0 },
+  { size: 64, lift: 10 },
+  { size: 104, lift: 0 },
+  { size: 72, lift: 4 },
+  { size: 96, lift: 0 },
+  { size: 60, lift: 14 },
+  { size: 84, lift: 2 },
 ];
 
 type Group = { title: string; links: [string, string][] };
@@ -114,7 +110,7 @@ export function HomeFooter() {
           <div className="foot__flat" aria-hidden="true">
             {FLAT.map((c, i) => (
               <span key={i} style={{ "--lift": `${c.lift}px` } as CSSProperties}>
-                <Creature size={c.size} accent={c.colour} mood={i % 3 === 1 ? "idle" : "sleep"} />
+                <Creature size={c.size} mood={i % 3 === 1 ? "watching" : "resting"} interactive={false} />
               </span>
             ))}
           </div>
@@ -122,8 +118,23 @@ export function HomeFooter() {
         <div className="foot__panel">
           <div className="foot__inner">
             <div className="foot__mark">
-              <div className="foot__lockup" aria-hidden="true">
-                <FusedLockup H={60} />
+              <div
+                className="foot__lockup"
+                aria-hidden="true"
+                style={{ display: "inline-flex", alignItems: "center", gap: "0.75rem" }}
+              >
+                <Flower m={48} tier="expressive" />
+                <span
+                  style={{
+                    fontFamily: "var(--site-font-display), ui-sans-serif, system-ui, sans-serif",
+                    fontWeight: 800,
+                    fontSize: "2.25rem",
+                    letterSpacing: "-0.04em",
+                    lineHeight: 1,
+                  }}
+                >
+                  GOTHAM <span style={{ color: "var(--echo-accent)" }}>OS</span>
+                </span>
               </div>
               <p className="foot__line">
                 GothamOS — Inteligência operacional e time de agentes corporativos, 100% local ou em nuvem privada.
@@ -137,8 +148,6 @@ export function HomeFooter() {
                   </Fragment>
                 ))}
               </p>
-              {/* Some of the heap above are Echo's supporters, named when pointed at (echo3d/stage.ts). */}
-              <HeapLine className="foot__line" />
             </div>
             <nav className="foot__nav" aria-label="Footer">
               {COLUMNS.map((c) => (
@@ -157,7 +166,7 @@ export function HomeFooter() {
             {/* A phone: the same links, a row a group (home.css shows one or the other). */}
             <nav className="foot__menu" aria-label="Footer">
               {/* The groups' headers are h3s: this h2 puts them under a heading on any page. */}
-              <h2 className="foot__sr">Echo&rsquo;s pages</h2>
+              <h2 className="foot__sr">Páginas do GothamOS</h2>
               <Accordion>
                 {PHONE_GROUPS.map((c) => (
                   <Accordion.Item key={c.title} value={c.title}>
@@ -176,10 +185,6 @@ export function HomeFooter() {
               </Accordion>
             </nav>
           </div>
-          {/*
-            The foot row: who it's from and on what terms, on the left; the fine print's pages and the
-            light key (where Cursor keeps its theme switch) on the right.
-          */}
           <div className="foot__legal">
             <p className="foot__legal-lines">
               <span>© 2026 Zack Studios · GothamOS</span>
@@ -193,7 +198,6 @@ export function HomeFooter() {
                 {label}
               </a>
             ))}
-            <DeviceSwitch opening={LANDING_SEED} />
           </div>
         </div>
       </div>
