@@ -163,7 +163,7 @@
    * The device's width here: a little narrower than the brand's 372px, its
    * screen the same height. The words and the paragraph make room for it from this.
    */
-  --hero-device: 348px;
+  --hero-device: 560px;
   box-sizing: border-box;
   /*
    * The card's contour forms with the scroll (--hero-frame, light/HeroLight.tsx: 0 at the top of the
@@ -358,8 +358,8 @@
   position: absolute;
   z-index: 1;
   left: 50%;
-  top: 48%;
-  width: min(var(--hero-device), 80vw);
+  top: 44%;
+  width: min(var(--hero-device), 92vw);
   translate: -50% -50%;
   /*
    * DESIGN and SYSTEM hang outside this box on purpose (the card clips them),

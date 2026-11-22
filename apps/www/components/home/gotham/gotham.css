@@ -486,7 +486,7 @@
 }
 
 .gotham-terminal__prompt {
-  color: #facc15;
+  color: var(--echo-accent);
   font-weight: 700;
 }
 

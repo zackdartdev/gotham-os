@@ -24,8 +24,7 @@
  */
 import { useEffect, useRef, type ReactNode } from "react";
 import { HardwareButton } from "@registry/echo/hardware-button";
-import { BrandDevice } from "@/components/brand/Device";
-import { DeviceSpinner } from "@/components/home/DeviceSpinner";
+import { Switch2Cutaway3D } from "@/components/home/Switch2Cutaway3D";
 import { NavTools } from "@/components/home/NavTools";
 import { Wordmark } from "@/components/site/SiteTopBar";
 import { useCopy } from "@/components/use-copy";
@@ -150,22 +149,20 @@ export function HomeHero({
         GothamOS: Inteligência operacional e time de agentes corporativos, 100% local ou em nuvem privada
       </h1>
 
-      <div className="hero4__device">
+      <div className="hero4__device hero4__device--switch2">
         <span className="hero4__small hero4__small--before" aria-hidden="true">
-          Camada executiva
+          Kirby Edition · Cutaway 3D
         </span>
         <span className="hero4__word hero4__word--left" aria-hidden="true">
-          GOTHAM
+          SWITCH
         </span>
         <span className="hero4__word hero4__word--right" aria-hidden="true">
-          OS
+          2
         </span>
         <span className="hero4__small hero4__small--after" aria-hidden="true">
-          time de agentes corporativos
+          joy-cons magnéticos destacáveis
         </span>
-        <DeviceSpinner float>
-          <BrandDevice away={away} />
-        </DeviceSpinner>
+        <Switch2Cutaway3D away={away} />
       </div>
 
       <div className="hero4__offer">

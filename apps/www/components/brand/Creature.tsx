@@ -32,8 +32,7 @@ import gsap from "gsap";
 import { RELIGHT_EVENT } from "@/components/home/journey/wear";
 import { useSiteSeed } from "@/components/site/theme-store";
 import { creatureCanvas, type CreatureCanvas } from "./creature-canvas";
-import { creature } from "./tokens";
-import { BODY, EYE_CATCH, EYE_CY, EYE_WHITE_L, EYE_WHITE_R, PUPIL_L, PUPIL_R, VIEWBOX } from "./paths";
+import { EYE_CY, VIEWBOX } from "./paths";
 import { createRig, stillPose, type Rig, type RigMood } from "./rig";
 
 /** Sway / breath pivot, near the body's low centre. */
@@ -201,70 +200,118 @@ export function Creature({
       />
       <svg ref={svg} viewBox={VIEWBOX} width={size} height={size} style={{ overflow: "visible", display: "block" }}>
         <defs>
-          <radialGradient id={`${uid}-body`} cx="38%" cy="30%" r="80%">
-            <stop offset="0%" style={{ stopColor: creature.bodyLight }} />
-            <stop offset="40%" style={{ stopColor: creature.body }} />
-            <stop offset="100%" style={{ stopColor: creature.bodyDeep }} />
+          <radialGradient id={`${uid}-body`} cx="36%" cy="28%" r="74%">
+            <stop offset="0%" stopColor="#ffd1e8" />
+            <stop offset="45%" stopColor="#ff85bf" />
+            <stop offset="100%" stopColor="#e2498d" />
           </radialGradient>
+          <radialGradient id={`${uid}-foot`} cx="35%" cy="30%" r="75%">
+            <stop offset="0%" stopColor="#ff4c7b" />
+            <stop offset="55%" stopColor="#d91b4c" />
+            <stop offset="100%" stopColor="#990d35" />
+          </radialGradient>
+          <linearGradient id={`${uid}-iris`} x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#0f172a" />
+            <stop offset="52%" stopColor="#1d4ed8" />
+            <stop offset="100%" stopColor="#38bdf8" />
+          </linearGradient>
           <radialGradient id={`${uid}-spec`} cx="34%" cy="24%" r="42%">
-            <stop offset="0%" stopColor="rgba(255,255,255,0.85)" />
-            <stop offset="60%" stopColor="rgba(255,255,255,0.12)" />
+            <stop offset="0%" stopColor="rgba(255,255,255,0.88)" />
+            <stop offset="60%" stopColor="rgba(255,255,255,0.16)" />
             <stop offset="100%" stopColor="rgba(255,255,255,0)" />
           </radialGradient>
         </defs>
         <g ref={drift}>
           <g ref={breath}>
-            {/* Gotham Superhero Cape: dark obsidian cloak with gold trim behind the body */}
-            <path
-              className="brand-creature__cape"
-              d="M113 24 C104 34 100 47 103 57 L116 53 L130 58 L144 53 L157 57 C160 47 156 34 147 24 Z"
-              fill="#0b0c10"
-              stroke="#facc15"
-              strokeWidth="0.9"
-              strokeLinejoin="round"
+            {/* Kirby's iconic big crimson feet */}
+            <ellipse
+              className="brand-creature__foot"
+              cx="118.5"
+              cy="52.5"
+              rx="10.2"
+              ry="6.1"
+              transform="rotate(-14 118.5 52.5)"
+              fill={`url(#${uid}-foot)`}
+              stroke="#7a0a29"
+              strokeWidth="0.7"
             />
-            {/* Named for a drawn look (brand.css): the body turns to paper with an ink line, the shine goes. */}
-            <path className="brand-creature__body" d={BODY} style={{ fill: gloss ? `url(#${uid}-body)` : creature.body }} />
-            {gloss && (
-              <path className="brand-creature__shine" d={BODY} fill="none" style={{ stroke: creature.bodyDeep }} strokeWidth="0.7" strokeOpacity="0.6" />
-            )}
-            {gloss && (
-              <ellipse className="brand-creature__shine" cx="125" cy="20" rx="5.4" ry="3.4" fill={`url(#${uid}-spec)`} transform="rotate(-18 125 20)" />
-            )}
-            {/* Gotham Superhero Cowl Ears */}
-            <path
-              className="brand-creature__cowl"
-              d="M116 17 L113.5 6.5 L123 13 Q130 11 137 13 L146.5 6.5 L144 17 Q130 14.2 116 17 Z"
-              fill="#0d0e12"
-              stroke="#facc15"
+            <ellipse
+              className="brand-creature__foot"
+              cx="141.5"
+              cy="52.5"
+              rx="10.2"
+              ry="6.1"
+              transform="rotate(14 141.5 52.5)"
+              fill={`url(#${uid}-foot)`}
+              stroke="#7a0a29"
+              strokeWidth="0.7"
+            />
+            {/* Kirby's stubby pink arms */}
+            <ellipse
+              className="brand-creature__arm"
+              cx="107.8"
+              cy="34.8"
+              rx="7.2"
+              ry="5.2"
+              transform="rotate(-26 107.8 34.8)"
+              fill={`url(#${uid}-body)`}
+              stroke="#cf3d7f"
               strokeWidth="0.65"
-              strokeLinejoin="round"
             />
-            {/* Gotham Tactical Domino Mask framing the glowing eyes */}
-            <path
-              className="brand-creature__mask"
-              d="M111.5 27.2 Q121 22.8 130 25.4 Q139 22.8 148.5 27.2 Q149.2 34.2 144.2 38 Q137 39.5 130 35.8 Q123 39.5 115.8 38 Q110.8 34.2 111.5 27.2 Z"
-              fill="#0d0e12"
-              stroke="#facc15"
+            <ellipse
+              className="brand-creature__arm"
+              cx="152.2"
+              cy="34.8"
+              rx="7.2"
+              ry="5.2"
+              transform="rotate(26 152.2 34.8)"
+              fill={`url(#${uid}-body)`}
+              stroke="#cf3d7f"
               strokeWidth="0.65"
-              strokeLinejoin="round"
             />
+            {/* Kirby's round pink body */}
+            <circle
+              className="brand-creature__body"
+              cx="130"
+              cy="33.5"
+              r="21.5"
+              fill={gloss ? `url(#${uid}-body)` : "#ff85bf"}
+              stroke="#d43f82"
+              strokeWidth="0.75"
+            />
+            {gloss && (
+              <ellipse
+                className="brand-creature__shine"
+                cx="122"
+                cy="21.5"
+                rx="7.2"
+                ry="4.2"
+                fill={`url(#${uid}-spec)`}
+                transform="rotate(-22 122 21.5)"
+              />
+            )}
+            {/* Rosy blush cheeks */}
+            <ellipse className="brand-creature__blush" cx="116.5" cy="36.2" rx="4.2" ry="2.2" fill="#ff3b82" opacity="0.68" />
+            <ellipse className="brand-creature__blush" cx="143.5" cy="36.2" rx="4.2" ry="2.2" fill="#ff3b82" opacity="0.68" />
+            {/* Iconic tall oval Kirby eyes */}
             <g ref={lids}>
-              <path className="brand-creature__eye" d={EYE_WHITE_L} style={{ fill: creature.eye }} />
-              <path className="brand-creature__eye" d={EYE_WHITE_R} style={{ fill: creature.eye }} />
+              <ellipse className="brand-creature__eye" cx="123.4" cy="29.8" rx="3.1" ry="6.2" fill="#0b0d17" />
+              <ellipse className="brand-creature__eye" cx="136.6" cy="29.8" rx="3.1" ry="6.2" fill="#0b0d17" />
               <g ref={pupils}>
-                <path className="brand-creature__pupil" d={PUPIL_L} style={{ fill: creature.pupil }} />
-                <path className="brand-creature__pupil" d={PUPIL_R} style={{ fill: creature.pupil }} />
-                {gloss &&
-                  EYE_CATCH.map(([x, y]) => <circle key={x} className="brand-creature__shine" cx={x} cy={y} r={0.55} fill="rgba(255,255,255,0.8)" />)}
+                <ellipse className="brand-creature__pupil" cx="123.4" cy="32.1" rx="2.1" ry="3.2" fill={`url(#${uid}-iris)`} />
+                <ellipse className="brand-creature__pupil" cx="136.6" cy="32.1" rx="2.1" ry="3.2" fill={`url(#${uid}-iris)`} />
+                <ellipse className="brand-creature__shine" cx="123.4" cy="26.8" rx="1.65" ry="2.55" fill="#ffffff" />
+                <ellipse className="brand-creature__shine" cx="136.6" cy="26.8" rx="1.65" ry="2.55" fill="#ffffff" />
               </g>
             </g>
-            {/* Gotham Golden Chest Shield & Tactical Wing Crest */}
-            <ellipse className="brand-creature__crest-bg" cx="130" cy="45.2" rx="7.4" ry="4.2" fill="#facc15" stroke="#0b0c10" strokeWidth="0.7" />
+            {/* Happy Kirby smile */}
             <path
-              className="brand-creature__crest"
-              d="M124.2 44.6 L126.8 43.2 L128.4 44.4 L130 42.6 L131.6 44.4 L133.2 43.2 L135.8 44.6 L133.6 46.9 L131.6 45.7 L130 47.6 L128.4 45.7 L126.4 46.9 Z"
-              fill="#09090b"
+              className="brand-creature__mouth"
+              d="M126.8 37.6 Q130 41.2 133.2 37.6"
+              fill="none"
+              stroke="#7a0a29"
+              strokeWidth="1.25"
+              strokeLinecap="round"
             />
           </g>
         </g>

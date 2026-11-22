@@ -12,17 +12,14 @@
  */
 import {
   CanvasTexture,
-  ConeGeometry,
   DoubleSide,
-  ExtrudeGeometry,
   Group,
   Mesh,
   MeshBasicMaterial,
-  MeshStandardMaterial,
+  MeshPhysicalMaterial,
   PlaneGeometry,
-  Shape,
+  SphereGeometry,
   type BufferGeometry,
-  type MeshPhysicalMaterial,
 } from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import type { Marble } from "./palette";
@@ -106,7 +103,8 @@ export class Creature3D {
    * barely shows on it; the heap tumbles, and shows both.
    */
   private readonly outline: Mesh;
-  private readonly heroCape: Group;
+  private readonly kirbyArmL: Mesh;
+  private readonly kirbyArmR: Mesh;
   private readonly heroParts: { dispose: () => void }[] = [];
   private target: MarbleColours;
 
@@ -147,82 +145,64 @@ export class Creature3D {
     this.outline.visible = false;
     this.breath.add(this.outline);
 
-    // --- Gotham Superhero Gear (3D Cape, Cowl Ears & Golden Chest Crest) ---
-    const obsidianMat = new MeshStandardMaterial({
-      color: 0x0b0c10,
-      roughness: 0.42,
-      metalness: 0.25,
-      side: DoubleSide,
-    });
-    const goldMat = new MeshStandardMaterial({
-      color: 0xfacc15,
-      emissive: 0x523b00,
-      emissiveIntensity: 0.35,
+    // --- Kirby Rosa 3D Anatomy (Pink Stubby Arms, Big Crimson Feet, Blush Cheeks) ---
+    const kirbyPinkMat = new MeshPhysicalMaterial({
+      color: 0xff82be,
       roughness: 0.28,
-      metalness: 0.65,
-      side: DoubleSide,
+      metalness: 0.04,
+      clearcoat: 0.75,
+      clearcoatRoughness: 0.22,
     });
-    this.heroParts.push(obsidianMat, goldMat);
+    const kirbyRedMat = new MeshPhysicalMaterial({
+      color: 0xd91b4c,
+      roughness: 0.24,
+      metalness: 0.06,
+      clearcoat: 0.85,
+      clearcoatRoughness: 0.18,
+    });
+    const kirbyBlushMat = new MeshBasicMaterial({
+      color: 0xff3b82,
+      transparent: true,
+      opacity: 0.72,
+    });
+    this.heroParts.push(kirbyPinkMat, kirbyRedMat, kirbyBlushMat);
 
-    // Flowing superhero cape behind the body
-    this.heroCape = new Group();
-    this.heroCape.position.set(0, 0.26, -0.34);
-    const capeShape = new Shape();
-    capeShape.moveTo(-0.56, 0.14);
-    capeShape.quadraticCurveTo(-0.98, -0.58, -0.94, -1.24);
-    capeShape.lineTo(-0.46, -1.06);
-    capeShape.lineTo(0, -1.28);
-    capeShape.lineTo(0.46, -1.06);
-    capeShape.lineTo(0.94, -1.24);
-    capeShape.quadraticCurveTo(0.98, -0.58, 0.56, 0.14);
-    capeShape.closePath();
-    const capeGeo = new ExtrudeGeometry(capeShape, { depth: 0.05, bevelEnabled: false });
-    const capeMesh = new Mesh(capeGeo, obsidianMat);
-    capeMesh.position.z = -0.04;
-    const capeTrimGeo = new ExtrudeGeometry(capeShape, { depth: 0.02, bevelEnabled: false });
-    const capeTrimMesh = new Mesh(capeTrimGeo, goldMat);
-    capeTrimMesh.scale.set(1.03, 1.02, 1);
-    capeTrimMesh.position.z = -0.06;
-    this.heroCape.add(capeMesh, capeTrimMesh);
-    this.heroParts.push(capeGeo, capeTrimGeo);
-    this.breath.add(this.heroCape);
+    // Stubby rosy pink arms
+    const armGeo = new SphereGeometry(0.26, 20, 16);
+    this.kirbyArmL = new Mesh(armGeo, kirbyPinkMat);
+    this.kirbyArmL.scale.set(1.15, 0.82, 0.88);
+    this.kirbyArmL.position.set(-0.92, -0.02, 0.08);
+    this.kirbyArmL.rotation.z = -0.35;
 
-    // Tactical cowl ears on top
-    const earGeo = new ConeGeometry(0.16, 0.44, 4);
-    const earL = new Mesh(earGeo, obsidianMat);
-    earL.position.set(-0.42, 0.94, 0.06);
-    earL.rotation.set(0.08, 0, 0.24);
-    const earR = new Mesh(earGeo, obsidianMat);
-    earR.position.set(0.42, 0.94, 0.06);
-    earR.rotation.set(0.08, 0, -0.24);
-    this.heroParts.push(earGeo);
-    this.breath.add(earL, earR);
+    this.kirbyArmR = new Mesh(armGeo, kirbyPinkMat);
+    this.kirbyArmR.scale.set(1.15, 0.82, 0.88);
+    this.kirbyArmR.position.set(0.92, -0.02, 0.08);
+    this.kirbyArmR.rotation.z = 0.35;
 
-    // Golden shield chest crest on front lower chest
-    const shieldShape = new Shape();
-    shieldShape.absellipse(0, 0, 0.3, 0.17, 0, Math.PI * 2, false, 0);
-    const shieldGeo = new ExtrudeGeometry(shieldShape, { depth: 0.04, bevelEnabled: false });
-    const shieldMesh = new Mesh(shieldGeo, goldMat);
-    shieldMesh.position.set(0, -0.44, 0.43);
-    const wingShape = new Shape();
-    wingShape.moveTo(-0.2, 0.01);
-    wingShape.lineTo(-0.1, 0.07);
-    wingShape.lineTo(-0.04, 0.02);
-    wingShape.lineTo(0, 0.09);
-    wingShape.lineTo(0.04, 0.02);
-    wingShape.lineTo(0.1, 0.07);
-    wingShape.lineTo(0.2, 0.01);
-    wingShape.lineTo(0.12, -0.07);
-    wingShape.lineTo(0.05, -0.02);
-    wingShape.lineTo(0, -0.09);
-    wingShape.lineTo(-0.05, -0.02);
-    wingShape.lineTo(-0.12, -0.07);
-    wingShape.closePath();
-    const wingGeo = new ExtrudeGeometry(wingShape, { depth: 0.025, bevelEnabled: false });
-    const wingMesh = new Mesh(wingGeo, obsidianMat);
-    wingMesh.position.set(0, -0.44, 0.465);
-    this.heroParts.push(shieldGeo, wingGeo);
-    this.breath.add(shieldMesh, wingMesh);
+    // Big glossy crimson feet
+    const footGeo = new SphereGeometry(0.32, 22, 16);
+    const footL = new Mesh(footGeo, kirbyRedMat);
+    footL.scale.set(1.22, 0.68, 1.48);
+    footL.position.set(-0.46, -0.84, 0.24);
+    footL.rotation.y = 0.26;
+
+    const footR = new Mesh(footGeo, kirbyRedMat);
+    footR.scale.set(1.22, 0.68, 1.48);
+    footR.position.set(0.46, -0.84, 0.24);
+    footR.rotation.y = -0.26;
+
+    // Rosy oval blush cheeks on the front
+    const blushGeo = new SphereGeometry(0.14, 16, 12);
+    const blushL = new Mesh(blushGeo, kirbyBlushMat);
+    blushL.scale.set(1.35, 0.65, 0.25);
+    blushL.position.set(-0.48, -0.14, 0.56);
+
+    const blushR = new Mesh(blushGeo, kirbyBlushMat);
+    blushR.scale.set(1.35, 0.65, 0.25);
+    blushR.position.set(0.48, -0.14, 0.56);
+
+    this.heroParts.push(armGeo, footGeo, blushGeo);
+    this.breath.add(this.kirbyArmL, this.kirbyArmR, footL, footR, blushL, blushR);
 
     this.lift.add(this.breath);
     this.turn.add(this.lift);
@@ -356,9 +336,10 @@ export class Creature3D {
     const squash = clamp(this.give, -0.2, 0.2) * 0.35;
     this.breath.scale.set(1 - breath * 0.5 + squash * 0.5, 1 + breath - squash, 1 - breath * 0.5 + squash * 0.5);
     this.breath.position.y = -(1 - this.breath.scale.y);
-    // Superhero cape billow with breath and air
-    const capeLift = still ? 0.14 : 0.14 + Math.sin(this.time * 2.4 + this.breathRate) * 0.06 + clamp((at.air ?? 0) + hopY, 0, 1) * 0.28;
-    this.heroCape.rotation.x = capeLift;
+    // Kirby happy arm wave with breath and air
+    const armWave = still ? 0 : Math.sin(this.time * 2.8 + this.breathRate) * 0.14 + clamp((at.air ?? 0) + hopY, 0, 1) * 0.42;
+    this.kirbyArmL.rotation.z = -0.35 - armWave;
+    this.kirbyArmR.rotation.z = 0.35 + armWave;
 
     // Lids: half shut asleep, and a blink every few seconds.
     const open = this.mood === "sleep" ? 0.2 : 1;

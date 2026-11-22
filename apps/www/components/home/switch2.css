@@ -1,0 +1,881 @@
+/* Nintendo Switch 2 — Cutaway 3D & Detachable Magnetic Joy-Cons
+ * Preserves 3D depth, drag-to-orbit, magnetic rail separation, and exploded PCB cutaway.
+ */
+
+.sw2-stage {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  perspective: 1400px;
+  user-select: none;
+  touch-action: pan-y;
+}
+
+.sw2-stage[data-grabbing] {
+  cursor: grabbing;
+}
+
+.sw2-viewport {
+  position: relative;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding-block: 1.5rem 2.2rem;
+  cursor: grab;
+  transform-style: preserve-3d;
+}
+
+.sw2-float {
+  transform-style: preserve-3d;
+  animation: sw2-bob 5.4s ease-in-out infinite;
+}
+
+@keyframes sw2-bob {
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-9px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sw2-float {
+    animation: none;
+  }
+}
+
+/* Main 3D Console Assembly */
+.sw2-rig {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 560px;
+  max-width: 92vw;
+  height: 244px;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+/* Ground Shadow */
+.sw2-shadow {
+  position: absolute;
+  bottom: 0.4rem;
+  left: 50%;
+  width: 72%;
+  height: 28px;
+  border-radius: 50%;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(0, 0, 0, 0.58) 0%,
+    color-mix(in oklab, var(--echo-accent) 18%, rgba(0, 0, 0, 0.25)) 48%,
+    transparent 74%
+  );
+  filter: blur(10px);
+  pointer-events: none;
+  transform: translateX(-50%);
+  transition: width 0.45s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.25s ease;
+}
+
+.sw2-stage[data-detached="true"] .sw2-shadow {
+  width: 86%;
+}
+
+/* ============================================================================
+ * CENTER TABLET UNIT (with 3D Cutaway Exploded Layers)
+ * ========================================================================== */
+
+.sw2-tablet {
+  position: relative;
+  width: 376px;
+  height: 234px;
+  transform-style: preserve-3d;
+  z-index: 2;
+}
+
+/* Top hardware details (vents, power, volume, USB-C) */
+.sw2-top-ports {
+  position: absolute;
+  top: -5px;
+  left: 24px;
+  right: 24px;
+  height: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  pointer-events: none;
+  transform: translateZ(-2px);
+}
+
+.sw2-power-vol {
+  display: flex;
+  gap: 5px;
+}
+
+.sw2-btn-top {
+  width: 14px;
+  height: 4px;
+  border-radius: 2px 2px 0 0;
+  background: #2b2f3a;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.sw2-btn-top--vol {
+  width: 26px;
+}
+
+.sw2-vents {
+  display: flex;
+  gap: 3px;
+}
+
+.sw2-vents span {
+  width: 6px;
+  height: 4px;
+  border-radius: 1px;
+  background: #090a0d;
+}
+
+.sw2-usbc {
+  width: 18px;
+  height: 4px;
+  border-radius: 2px;
+  background: #101218;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+}
+
+/* Extruded tablet chassis thickness */
+.sw2-tablet__depth {
+  position: absolute;
+  inset: 0;
+  border-radius: 18px;
+  background: linear-gradient(180deg, #1b1d24, #0d0f14);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  pointer-events: none;
+  transition: opacity 0.4s ease;
+}
+
+.sw2-stage[data-cutaway="true"] .sw2-tablet__depth {
+  opacity: 0.22;
+}
+
+/* Rear Graphite Shell & U-Kickstand (Layer 3) */
+.sw2-tablet__back {
+  position: absolute;
+  inset: 0;
+  border-radius: 18px;
+  background: linear-gradient(155deg, #21242e 0%, #12141a 60%, #0c0d11 100%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: inset 0 0 24px rgba(0, 0, 0, 0.65);
+  transform: translateZ(-18px) rotateY(180deg);
+  backface-visibility: visible;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  transition: transform 0.65s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.5s ease;
+}
+
+.sw2-stage[data-cutaway="true"] .sw2-tablet__back {
+  transform: translateZ(-44px) rotateY(180deg);
+  box-shadow:
+    inset 0 0 24px rgba(0, 0, 0, 0.7),
+    0 24px 48px rgba(0, 0, 0, 0.5);
+}
+
+.sw2-kickstand {
+  position: absolute;
+  bottom: 14px;
+  left: 34px;
+  right: 34px;
+  height: 78px;
+  border: 5px solid #2b2f3b;
+  border-top: 0;
+  border-radius: 0 0 14px 14px;
+  opacity: 0.85;
+}
+
+.sw2-back-logo {
+  font-family: var(--site-font-display), ui-sans-serif, system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 0.88rem;
+  letter-spacing: 0.22em;
+  color: rgba(255, 255, 255, 0.24);
+  text-transform: uppercase;
+}
+
+.sw2-back-sub {
+  font-family: var(--site-font-mono), ui-monospace, monospace;
+  font-size: 0.62rem;
+  letter-spacing: 0.14em;
+  color: color-mix(in oklab, var(--echo-accent) 60%, rgba(255, 255, 255, 0.3));
+}
+
+/* Internal Cutaway PCB Layer (Layer 2 — revealed in Cutaway 3D mode) */
+.sw2-pcb {
+  position: absolute;
+  inset: 7px;
+  border-radius: 13px;
+  background: linear-gradient(145deg, #101926 0%, #0a1019 100%);
+  border: 1px solid color-mix(in oklab, var(--echo-accent) 55%, rgba(0, 212, 255, 0.45));
+  box-shadow:
+    0 0 28px color-mix(in oklab, var(--echo-accent) 20%, transparent),
+    inset 0 0 18px rgba(0, 212, 255, 0.14);
+  transform: translateZ(-2px);
+  opacity: 0;
+  pointer-events: none;
+  overflow: hidden;
+  transition:
+    opacity 0.45s ease,
+    transform 0.65s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.sw2-stage[data-cutaway="true"] .sw2-pcb {
+  opacity: 1;
+  transform: translateZ(0px);
+}
+
+.sw2-pcb svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.sw2-fan-blades {
+  transform-origin: 242px 96px;
+  animation: sw2-fan-spin 2.2s linear infinite;
+}
+
+@keyframes sw2-fan-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Front Glass & 7.9" Display (Layer 1 — floats forward in Cutaway 3D mode) */
+.sw2-front {
+  position: absolute;
+  inset: 0;
+  border-radius: 18px;
+  padding: 9px;
+  background: linear-gradient(160deg, #252834 0%, #13151c 48%, #0c0d12 100%);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    inset 0 -2px 6px rgba(0, 0, 0, 0.7),
+    0 24px 54px -18px rgba(0, 0, 0, 0.75);
+  transform: translateZ(0px);
+  transform-style: preserve-3d;
+  transition:
+    transform 0.65s cubic-bezier(0.22, 1, 0.36, 1),
+    background 0.45s ease,
+    box-shadow 0.45s ease;
+}
+
+.sw2-stage[data-cutaway="true"] .sw2-front {
+  transform: translateZ(46px);
+  background: linear-gradient(160deg, rgba(37, 40, 52, 0.76) 0%, rgba(19, 21, 28, 0.68) 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.35),
+    0 28px 60px rgba(0, 0, 0, 0.55),
+    0 0 0 1px color-mix(in oklab, var(--echo-accent) 45%, transparent);
+}
+
+/* Magnetic Connector Bays on Tablet Left & Right Edges */
+.sw2-mag-bay {
+  position: absolute;
+  top: 26px;
+  bottom: 26px;
+  width: 6px;
+  border-radius: 3px;
+  background: #090a0e;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  opacity: 0.35;
+  transition: opacity 0.35s ease, box-shadow 0.35s ease;
+}
+
+.sw2-mag-bay--left {
+  left: -3px;
+  border-left: 2px solid #00d4ff;
+}
+
+.sw2-mag-bay--right {
+  right: -3px;
+  border-right: 2px solid #ff5a5f;
+}
+
+.sw2-stage[data-left-detached="true"] .sw2-mag-bay--left {
+  opacity: 1;
+  box-shadow: -4px 0 16px rgba(0, 212, 255, 0.75);
+}
+
+.sw2-stage[data-right-detached="true"] .sw2-mag-bay--right {
+  opacity: 1;
+  box-shadow: 4px 0 16px rgba(255, 90, 95, 0.75);
+}
+
+.sw2-mag-pin {
+  width: 3px;
+  height: 10px;
+  border-radius: 2px;
+  background: linear-gradient(180deg, #fde047, #f59e0b);
+}
+
+/* 7.9" Screen inside Tablet */
+.sw2-screen {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 11px;
+  overflow: hidden;
+  --echo-clip: decorative;
+  background:
+    radial-gradient(circle at 50% 42%, color-mix(in oklab, var(--echo-accent) 26%, #24142d) 0%, #100b18 68%, #07050c 100%);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+  transition: opacity 0.45s ease;
+}
+
+.sw2-stage[data-cutaway="true"] .sw2-screen {
+  background:
+    radial-gradient(circle at 50% 42%, rgba(255, 111, 174, 0.22) 0%, rgba(16, 11, 24, 0.56) 72%, rgba(7, 5, 12, 0.62) 100%);
+}
+
+.sw2-screen__stars {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    radial-gradient(1.5px 1.5px at 16% 24%, rgba(255, 255, 255, 0.65), transparent),
+    radial-gradient(1.5px 1.5px at 82% 28%, rgba(255, 198, 226, 0.75), transparent),
+    radial-gradient(1.5px 1.5px at 24% 74%, rgba(0, 212, 255, 0.55), transparent),
+    radial-gradient(2px 2px at 78% 72%, rgba(255, 111, 174, 0.7), transparent),
+    radial-gradient(1.2px 1.2px at 52% 16%, rgba(255, 255, 255, 0.5), transparent);
+}
+
+.sw2-screen__aura {
+  position: absolute;
+  left: 50%;
+  top: 48%;
+  width: 185px;
+  height: 185px;
+  border-radius: 999px;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(circle, rgba(255, 111, 174, 0.48) 0%, rgba(255, 111, 174, 0.14) 45%, transparent 70%);
+  filter: blur(18px);
+  pointer-events: none;
+}
+
+.sw2-screen__creature {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  --echo-clip: decorative;
+}
+
+.sw2-screen__home {
+  display: block;
+}
+
+.sw2-stage[data-away="true"] .sw2-screen__home {
+  visibility: hidden;
+}
+
+.sw2-screen__brb {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-family: var(--site-font-mono), ui-monospace, monospace;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  color: #ffb8dc;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+
+.sw2-stage[data-away="true"] .sw2-screen__brb {
+  opacity: 1;
+}
+
+/* Switch 2 HUD Overlay inside screen */
+.sw2-hud-top,
+.sw2-hud-bot {
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-family: var(--site-font-mono), ui-monospace, monospace;
+  font-size: 0.64rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255, 232, 244, 0.85);
+  pointer-events: none;
+}
+
+.sw2-hud-top {
+  top: 9px;
+}
+
+.sw2-hud-bot {
+  bottom: 9px;
+  color: rgba(255, 210, 232, 0.68);
+}
+
+.sw2-hud-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: rgba(15, 10, 22, 0.62);
+  border: 1px solid rgba(255, 111, 174, 0.38);
+}
+
+.sw2-hud-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #ff6fae;
+  box-shadow: 0 0 8px #ff6fae;
+}
+
+.sw2-glass {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(125deg, rgba(255, 255, 255, 0.14) 0%, transparent 38%, transparent 72%, rgba(255, 255, 255, 0.04) 100%);
+  pointer-events: none;
+}
+
+/* ============================================================================
+ * DETACHABLE MAGNETIC JOY-CON 2 CONTROLLERS (LEFT = CYAN, RIGHT = CORAL)
+ * ========================================================================== */
+
+.sw2-joycon {
+  position: relative;
+  width: 88px;
+  height: 234px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  transform-style: preserve-3d;
+  transition: transform 0.62s cubic-bezier(0.22, 1, 0.36, 1), filter 0.3s ease;
+  z-index: 3;
+}
+
+.sw2-joycon:focus-visible {
+  outline: 2px solid var(--echo-accent);
+  outline-offset: 6px;
+  border-radius: 36px;
+}
+
+.sw2-joycon--left {
+  margin-right: -2px;
+}
+
+.sw2-joycon--right {
+  margin-left: -2px;
+}
+
+/* Detached 3D magnetic pop-out */
+.sw2-joycon--left[data-detached="true"] {
+  transform: translate3d(-56px, -12px, 34px) rotateY(18deg) rotateZ(-5deg);
+}
+
+.sw2-joycon--right[data-detached="true"] {
+  transform: translate3d(56px, -12px, 34px) rotateY(-18deg) rotateZ(5deg);
+}
+
+.sw2-joycon:hover:not([data-detached="true"]).sw2-joycon--left {
+  transform: translateX(-6px);
+}
+
+.sw2-joycon:hover:not([data-detached="true"]).sw2-joycon--right {
+  transform: translateX(6px);
+}
+
+.sw2-joycon__body {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 10px 22px;
+  box-sizing: border-box;
+  background: linear-gradient(160deg, #272b36 0%, #181a22 52%, #101218 100%);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow:
+    inset 0 1.5px 0 rgba(255, 255, 255, 0.16),
+    inset 0 -3px 8px rgba(0, 0, 0, 0.65),
+    0 20px 40px -16px rgba(0, 0, 0, 0.72);
+  transform-style: preserve-3d;
+}
+
+.sw2-joycon--left .sw2-joycon__body {
+  border-radius: 42px 8px 8px 42px;
+  border-right: 4px solid #00d4ff;
+  box-shadow:
+    inset -3px 0 12px rgba(0, 212, 255, 0.25),
+    inset 0 1.5px 0 rgba(255, 255, 255, 0.16),
+    0 20px 40px -16px rgba(0, 0, 0, 0.72);
+}
+
+.sw2-joycon--right .sw2-joycon__body {
+  border-radius: 8px 42px 42px 8px;
+  border-left: 4px solid #ff5a5f;
+  box-shadow:
+    inset 3px 0 12px rgba(255, 90, 95, 0.25),
+    inset 0 1.5px 0 rgba(255, 255, 255, 0.16),
+    0 20px 40px -16px rgba(0, 0, 0, 0.72);
+}
+
+/* Shoulder Trigger (L / R) */
+.sw2-trigger {
+  position: absolute;
+  top: -5px;
+  width: 54px;
+  height: 10px;
+  background: linear-gradient(180deg, #323645, #1b1e26);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  z-index: -1;
+}
+
+.sw2-joycon--left .sw2-trigger {
+  left: 14px;
+  border-radius: 14px 4px 0 0;
+}
+
+.sw2-joycon--right .sw2-trigger {
+  right: 14px;
+  border-radius: 4px 14px 0 0;
+}
+
+/* Magnetic Rail Connector Strip (glows on detach) */
+.sw2-rail-glow {
+  position: absolute;
+  top: 22px;
+  bottom: 22px;
+  width: 6px;
+  border-radius: 3px;
+  opacity: 0;
+  transition: opacity 0.35s ease;
+  pointer-events: none;
+}
+
+.sw2-joycon--left .sw2-rail-glow {
+  right: -7px;
+  background: linear-gradient(180deg, transparent, #00d4ff, transparent);
+  box-shadow: 0 0 16px #00d4ff;
+}
+
+.sw2-joycon--right .sw2-rail-glow {
+  left: -7px;
+  background: linear-gradient(180deg, transparent, #ff5a5f, transparent);
+  box-shadow: 0 0 16px #ff5a5f;
+}
+
+.sw2-joycon[data-detached="true"] .sw2-rail-glow {
+  opacity: 1;
+}
+
+/* Minus / Plus */
+.sw2-minus,
+.sw2-plus {
+  position: relative;
+  align-self: flex-end;
+  margin-right: 4px;
+  width: 12px;
+  height: 3.5px;
+  border-radius: 2px;
+  background: #4b5263;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+}
+
+.sw2-plus {
+  align-self: flex-start;
+  margin-left: 4px;
+}
+
+.sw2-plus::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 3.5px;
+  height: 12px;
+  border-radius: 2px;
+  background: #4b5263;
+  transform: translate(-50%, -50%);
+}
+
+/* Analog Stick with Switch 2 Neon Under-Ring */
+.sw2-stick {
+  position: relative;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.65);
+  transform: translateZ(6px);
+}
+
+.sw2-stick--cyan {
+  background: radial-gradient(circle, #00d4ff 52%, #0082a8 100%);
+  box-shadow: 0 0 14px rgba(0, 212, 255, 0.35), 0 6px 12px rgba(0, 0, 0, 0.65);
+}
+
+.sw2-stick--coral {
+  background: radial-gradient(circle, #ff5a5f 52%, #b52b31 100%);
+  box-shadow: 0 0 14px rgba(255, 90, 95, 0.35), 0 6px 12px rgba(0, 0, 0, 0.65);
+}
+
+.sw2-stick__cap {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 32%, #383d4a 0%, #1b1e26 65%, #111319 100%);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.7);
+}
+
+/* 4-Button Diamond (D-pad / ABXY) */
+.sw2-diamond {
+  position: relative;
+  width: 50px;
+  height: 50px;
+}
+
+.sw2-btn {
+  position: absolute;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-family: var(--site-font-mono), ui-monospace, monospace;
+  font-size: 0.5rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.72);
+  background: radial-gradient(circle at 35% 30%, #383e4d, #1b1e27);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.7);
+}
+
+.sw2-btn--n {
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+}
+.sw2-btn--s {
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+}
+.sw2-btn--w {
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+}
+.sw2-btn--e {
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+/* Capture / Home + Switch 2 C-button */
+.sw2-sub-btns {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sw2-capture {
+  width: 13px;
+  height: 13px;
+  border-radius: 3px;
+  background: #232732;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  display: grid;
+  place-items: center;
+}
+
+.sw2-capture::after {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #101218;
+}
+
+.sw2-home-btn,
+.sw2-c-btn {
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  background: #232732;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  display: grid;
+  place-items: center;
+  font-family: var(--site-font-mono), ui-monospace, monospace;
+  font-size: 0.48rem;
+  font-weight: 800;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.sw2-c-btn {
+  border-radius: 4px;
+  border-color: color-mix(in oklab, var(--echo-accent) 55%, rgba(255, 255, 255, 0.2));
+  color: var(--echo-accent);
+}
+
+/* ============================================================================
+ * CUTAWAY 3D CALLOUT TAGS & CONTROL BAR
+ * ========================================================================== */
+
+.sw2-callout {
+  position: absolute;
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-family: var(--site-font-mono), ui-monospace, monospace;
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  background: rgba(12, 10, 18, 0.88);
+  border: 1px solid color-mix(in oklab, var(--echo-accent) 60%, rgba(255, 255, 255, 0.18));
+  color: #ffe4f1;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.4s ease, transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.sw2-stage[data-cutaway="true"] .sw2-callout {
+  opacity: 1;
+}
+
+.sw2-callout--screen {
+  top: -28px;
+  left: 16px;
+  transform: translateZ(56px);
+}
+
+.sw2-callout--soc {
+  bottom: -26px;
+  left: 50%;
+  transform: translateX(-50%) translateZ(14px);
+}
+
+.sw2-controls {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.45rem;
+  margin-top: 0.35rem;
+  z-index: 5;
+}
+
+.sw2-ctrl {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.42rem 0.82rem;
+  border-radius: 999px;
+  border: 1px solid color-mix(in oklab, var(--echo-accent) 32%, rgba(255, 255, 255, 0.16));
+  background: color-mix(in oklab, var(--echo-surface) 84%, transparent);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  color: var(--echo-text);
+  font-family: var(--site-font-mono), ui-monospace, monospace;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: transform 0.16s ease, border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.sw2-ctrl:hover {
+  transform: translateY(-1px);
+  border-color: var(--echo-accent);
+}
+
+.sw2-ctrl[aria-pressed="true"] {
+  background: color-mix(in oklab, var(--echo-accent) 24%, var(--echo-surface));
+  border-color: var(--echo-accent);
+  color: #fff;
+  box-shadow: 0 0 18px color-mix(in oklab, var(--echo-accent) 35%, transparent);
+}
+
+.sw2-ctrl__dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--echo-accent);
+}
+
+.sw2-ctrl__dot--cyan {
+  background: #00d4ff;
+}
+
+/* Responsive scaling for smaller screens */
+@media (max-width: 680px) {
+  .sw2-rig {
+    transform-origin: center;
+    width: 340px;
+    height: 170px;
+  }
+  .sw2-tablet {
+    width: 224px;
+    height: 162px;
+  }
+  .sw2-joycon {
+    width: 58px;
+    height: 162px;
+  }
+  .sw2-joycon__body {
+    padding: 12px 6px 14px;
+  }
+  .sw2-stick {
+    width: 26px;
+    height: 26px;
+  }
+  .sw2-stick__cap {
+    width: 20px;
+    height: 20px;
+  }
+  .sw2-diamond {
+    width: 36px;
+    height: 36px;
+  }
+  .sw2-btn {
+    width: 11px;
+    height: 11px;
+    font-size: 0.38rem;
+  }
+  .sw2-joycon--left[data-detached="true"] {
+    transform: translate3d(-28px, -8px, 24px) rotateY(15deg) rotateZ(-4deg);
+  }
+  .sw2-joycon--right[data-detached="true"] {
+    transform: translate3d(28px, -8px, 24px) rotateY(-15deg) rotateZ(4deg);
+  }
+}

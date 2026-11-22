@@ -1,0 +1,410 @@
+"use client";
+
+/**
+ * <Switch2Cutaway3D> — Interactive 3D Nintendo Switch 2 with:
+ *   - Detachable magnetic Joy-Con 2 controllers (click each Joy-Con or use the button)
+ *   - Cutaway 3D exploded hardware view (Glass Display → Tegra T239 PCB + Fan → Rear Kickstand)
+ *   - Kirby Rosa living on the 7.9" OLED/LCD screen (steps out into 3D on scroll via data-guide-home)
+ *   - Pointer drag-to-orbit 3D rotation with inertia and smooth return to resting angle
+ */
+import { useEffect, useRef, useState } from "react";
+import { Creature } from "@/components/brand/Creature";
+import "./switch2.css";
+
+export function Switch2Cutaway3D({ away = false }: { away?: boolean }) {
+  const host = useRef<HTMLDivElement>(null);
+  const rig = useRef<HTMLDivElement>(null);
+  const shadow = useRef<HTMLDivElement>(null);
+
+  const [leftDetached, setLeftDetached] = useState(false);
+  const [rightDetached, setRightDetached] = useState(false);
+  const [cutaway, setCutaway] = useState(false);
+  const [awake, setAwake] = useState(true);
+
+  const bothDetached = leftDetached && rightDetached;
+
+  // Toggle both Joy-Cons together
+  const toggleBothJoyCons = () => {
+    const next = !(leftDetached && rightDetached);
+    setLeftDetached(next);
+    setRightDetached(next);
+  };
+
+  // Interactive 3D drag-to-orbit & pointer lean
+  useEffect(() => {
+    const el = host.current;
+    const body = rig.current;
+    const ground = shadow.current;
+    if (!el || !body) return;
+
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    let yaw = cutaway ? -16 : -6;
+    let pitch = cutaway ? 10 : 5;
+    let yawV = 0;
+    let pitchV = 0;
+    let leanX = 0;
+    let leanY = 0;
+    let drag: { id: number; x: number; y: number; t: number } | null = null;
+    let releasedAt = -Infinity;
+    let pointer: { x: number; y: number } | null = null;
+    let last = performance.now();
+    let raf = 0;
+    let still = 0;
+
+    const restYaw = cutaway ? -20 : -6;
+    const restPitch = cutaway ? 11 : 4;
+
+    const apply = () => {
+      body.style.transform = `rotateX(${(pitch + leanX).toFixed(2)}deg) rotateY(${(yaw + leanY).toFixed(2)}deg)`;
+      if (ground) {
+        const yRad = ((yaw + leanY) * Math.PI) / 180;
+        const scaleX = Math.max(0.45, Math.abs(Math.cos(yRad)));
+        ground.style.transform = `translateX(-50%) scaleX(${scaleX.toFixed(3)})`;
+      }
+    };
+
+    const tick = (now: number) => {
+      const dt = Math.min(0.05, (now - last) / 1000);
+      last = now;
+      if (!drag && !reduced) {
+        yaw += yawV * dt;
+        pitch = Math.max(-42, Math.min(42, pitch + pitchV * dt));
+        const damp = Math.exp(-dt * 2.4);
+        yawV *= damp;
+        pitchV *= damp;
+        if (now - releasedAt > 2400) {
+          const home = restYaw + Math.round((yaw - restYaw) / 360) * 360;
+          const k = 1 - Math.exp(-dt * 2.8);
+          yaw += (home - yaw) * k;
+          pitch += (restPitch - pitch) * k;
+        }
+        let tx = 0;
+        let ty = 0;
+        if (pointer) {
+          const r = el.getBoundingClientRect();
+          const nx = (pointer.x - (r.left + r.width / 2)) / Math.max(1, r.width);
+          const ny = (pointer.y - (r.top + r.height / 2)) / Math.max(1, r.height);
+          if (Math.abs(nx) < 1.5 && Math.abs(ny) < 1.5) {
+            ty = Math.max(-1, Math.min(1, nx)) * 10;
+            tx = Math.max(-1, Math.min(1, -ny)) * 7;
+          }
+        }
+        const k = 1 - Math.exp(-dt * 6);
+        leanX += (tx - leanX) * k;
+        leanY += (ty - leanY) * k;
+      }
+      apply();
+      const moving =
+        Boolean(drag) ||
+        Math.abs(yawV) > 0.4 ||
+        Math.abs(pitchV) > 0.4 ||
+        Math.abs(yaw - restYaw) > 0.25 ||
+        Math.abs(pitch - restPitch) > 0.25 ||
+        Boolean(pointer);
+      still = moving ? 0 : still + dt;
+      raf = still > 0.35 ? 0 : requestAnimationFrame(tick);
+    };
+
+    const wake = () => {
+      if (!raf) {
+        last = performance.now();
+        still = 0;
+        raf = requestAnimationFrame(tick);
+      }
+    };
+
+    const onDown = (e: PointerEvent) => {
+      if (e.button !== 0 || (e.target instanceof Element && e.target.closest("button, a"))) return;
+      drag = { id: e.pointerId, x: e.clientX, y: e.clientY, t: performance.now() };
+      el.setPointerCapture(e.pointerId);
+      el.dataset.grabbing = "";
+      yawV = pitchV = 0;
+      wake();
+    };
+
+    const onMove = (e: PointerEvent) => {
+      pointer = { x: e.clientX, y: e.clientY };
+      if (!drag || e.pointerId !== drag.id) {
+        if (!reduced) wake();
+        return;
+      }
+      const now = performance.now();
+      const dt = Math.max(1, now - drag.t) / 1000;
+      const dy = (e.clientX - drag.x) * 0.48;
+      const dx = -(e.clientY - drag.y) * 0.34;
+      yaw += dy;
+      pitch = Math.max(-42, Math.min(42, pitch + dx));
+      yawV = dy / dt;
+      pitchV = dx / dt;
+      drag = { ...drag, x: e.clientX, y: e.clientY, t: now };
+      apply();
+    };
+
+    const onUp = (e: PointerEvent) => {
+      if (!drag || e.pointerId !== drag.id) return;
+      drag = null;
+      delete el.dataset.grabbing;
+      releasedAt = performance.now();
+      if (reduced) yawV = pitchV = 0;
+      wake();
+    };
+
+    const onLeave = () => {
+      pointer = null;
+    };
+
+    el.addEventListener("pointerdown", onDown);
+    window.addEventListener("pointermove", onMove, { passive: true });
+    el.addEventListener("pointerup", onUp);
+    el.addEventListener("pointercancel", onUp);
+    document.documentElement.addEventListener("pointerleave", onLeave);
+    apply();
+    wake();
+
+    return () => {
+      cancelAnimationFrame(raf);
+      el.removeEventListener("pointerdown", onDown);
+      window.removeEventListener("pointermove", onMove);
+      el.removeEventListener("pointerup", onUp);
+      el.removeEventListener("pointercancel", onUp);
+      document.documentElement.removeEventListener("pointerleave", onLeave);
+    };
+  }, [cutaway]);
+
+  return (
+    <div
+      ref={host}
+      className="sw2-stage"
+      data-cutaway={cutaway ? "true" : "false"}
+      data-detached={leftDetached || rightDetached ? "true" : "false"}
+      data-left-detached={leftDetached ? "true" : "false"}
+      data-right-detached={rightDetached ? "true" : "false"}
+      data-away={away ? "true" : "false"}
+    >
+      <div className="sw2-viewport" aria-label="Nintendo Switch 2 interativo em 3D. Arraste para girar ou clique nos Joy-Cons para destacar.">
+        <div className="sw2-float">
+          <div ref={rig} className="sw2-rig">
+            {/* LEFT JOY-CON 2 (Magnetic Cyan) */}
+            <button
+              type="button"
+              className="sw2-joycon sw2-joycon--left"
+              data-detached={leftDetached ? "true" : "false"}
+              onClick={() => setLeftDetached((v) => !v)}
+              aria-pressed={leftDetached}
+              aria-label={leftDetached ? "Encaixar Joy-Con Esquerdo" : "Destacar Joy-Con Esquerdo"}
+              title="Clique para destacar/encaixar Joy-Con L"
+            >
+              <span className="sw2-trigger" aria-hidden="true" />
+              <span className="sw2-rail-glow" aria-hidden="true" />
+              <span className="sw2-joycon__body">
+                <span className="sw2-minus" aria-hidden="true" />
+                <span className="sw2-stick sw2-stick--cyan" aria-hidden="true">
+                  <span className="sw2-stick__cap" />
+                </span>
+                <span className="sw2-diamond" aria-hidden="true">
+                  <span className="sw2-btn sw2-btn--n">▲</span>
+                  <span className="sw2-btn sw2-btn--w">◀</span>
+                  <span className="sw2-btn sw2-btn--e">▶</span>
+                  <span className="sw2-btn sw2-btn--s">▼</span>
+                </span>
+                <span className="sw2-capture" aria-hidden="true" />
+              </span>
+            </button>
+
+            {/* CENTER TABLET WITH CUTAWAY 3D LAYERS */}
+            <div className="sw2-tablet">
+              <div className="sw2-top-ports" aria-hidden="true">
+                <span className="sw2-power-vol">
+                  <span className="sw2-btn-top" />
+                  <span className="sw2-btn-top sw2-btn-top--vol" />
+                </span>
+                <span className="sw2-vents">
+                  <span />
+                  <span />
+                  <span />
+                  <span />
+                  <span />
+                </span>
+                <span className="sw2-usbc" />
+              </div>
+
+              {/* Extruded chassis depth slices */}
+              <span className="sw2-tablet__depth" style={{ transform: "translateZ(-6px)" }} aria-hidden="true" />
+              <span className="sw2-tablet__depth" style={{ transform: "translateZ(-12px)" }} aria-hidden="true" />
+
+              {/* Layer 3: Rear Graphite Shell & Kickstand */}
+              <div className="sw2-tablet__back" aria-hidden="true">
+                <span className="sw2-back-logo">SWITCH 2</span>
+                <span className="sw2-back-sub">KIRBY EDITION · CUTAWAY 3D</span>
+                <span className="sw2-kickstand" />
+              </div>
+
+              {/* Layer 2: Cutaway Internal Motherboard (Tegra T239 + Vapor Fan + Battery) */}
+              <div className="sw2-pcb" aria-hidden="true">
+                <svg viewBox="0 0 360 220" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  {/* PCB Grid & Traces */}
+                  <rect x="6" y="6" width="348" height="208" rx="10" fill="#0b1320" stroke="#ff6fae" strokeOpacity="0.35" />
+                  <path d="M22 44 H92 L112 64 H158" stroke="#00d4ff" strokeOpacity="0.45" strokeWidth="1.5" />
+                  <path d="M22 178 H84 L106 154 H164" stroke="#ff6fae" strokeOpacity="0.45" strokeWidth="1.5" />
+                  <path d="M338 56 H286 L268 74" stroke="#ff5a5f" strokeOpacity="0.45" strokeWidth="1.5" />
+                  <path d="M338 164 H276 L252 140" stroke="#00d4ff" strokeOpacity="0.4" strokeWidth="1.5" />
+
+                  {/* Dual-cell Li-Ion Battery (Left) */}
+                  <rect x="24" y="64" width="114" height="106" rx="8" fill="#172033" stroke="#334155" strokeWidth="1.4" />
+                  <text x="81" y="108" textAnchor="middle" fill="#94a3b8" fontSize="9" fontFamily="monospace" fontWeight="700">
+                    LI-ION 5220mAh
+                  </text>
+                  <text x="81" y="124" textAnchor="middle" fill="#ff6fae" fontSize="8" fontFamily="monospace">
+                    CELL-A / B
+                  </text>
+
+                  {/* Custom NVIDIA Tegra T239 SoC Die (Center) */}
+                  <rect x="150" y="72" width="54" height="54" rx="6" fill="#1e1b2e" stroke="#ff6fae" strokeWidth="1.8" />
+                  <rect x="160" y="82" width="34" height="34" rx="4" fill="#ff6fae" fillOpacity="0.22" stroke="#ffb3d9" strokeWidth="1" />
+                  <text x="177" y="101" textAnchor="middle" fill="#ffe4f1" fontSize="8.5" fontFamily="monospace" fontWeight="700">
+                    T239
+                  </text>
+                  <text x="177" y="142" textAnchor="middle" fill="#00d4ff" fontSize="7.5" fontFamily="monospace">
+                    ARM + AMPERE
+                  </text>
+
+                  {/* Copper Heatpipe connecting SoC to Radial Fan */}
+                  <path d="M196 92 C214 92 216 70 242 70" stroke="#f59e0b" strokeWidth="7" strokeLinecap="round" strokeOpacity="0.85" />
+                  <path d="M196 92 C214 92 216 70 242 70" stroke="#fde68a" strokeWidth="2" strokeLinecap="round" strokeOpacity="0.7" />
+
+                  {/* Spinning Radial Vapor-Chamber Fan (Right) */}
+                  <circle cx="242" cy="96" r="34" fill="#0f172a" stroke="#475569" strokeWidth="1.6" />
+                  <g className="sw2-fan-blades">
+                    <circle cx="242" cy="96" r="10" fill="#ff6fae" fillOpacity="0.85" />
+                    <path d="M242 66 L248 86 L236 86 Z" fill="#94a3b8" />
+                    <path d="M242 126 L236 106 L248 106 Z" fill="#94a3b8" />
+                    <path d="M212 96 L232 90 L232 102 Z" fill="#94a3b8" />
+                    <path d="M272 96 L252 102 L252 90 Z" fill="#94a3b8" />
+                    <path d="M221 75 L238 87 L230 95 Z" fill="#64748b" />
+                    <path d="M263 117 L246 105 L254 97 Z" fill="#64748b" />
+                    <path d="M263 75 L254 95 L246 87 Z" fill="#64748b" />
+                    <path d="M221 117 L230 97 L238 105 Z" fill="#64748b" />
+                  </g>
+
+                  {/* Magnetic Latch Coils (Left & Right) */}
+                  <rect x="10" y="76" width="8" height="68" rx="3" fill="#00d4ff" fillOpacity="0.45" />
+                  <rect x="342" y="76" width="8" height="68" rx="3" fill="#ff5a5f" fillOpacity="0.45" />
+
+                  {/* Flash Storage & Wi-Fi 6E */}
+                  <rect x="292" y="78" width="40" height="32" rx="4" fill="#172033" stroke="#00d4ff" strokeOpacity="0.55" />
+                  <text x="312" y="97" textAnchor="middle" fill="#cbd5e1" fontSize="7" fontFamily="monospace">
+                    256GB
+                  </text>
+                  <rect x="150" y="156" width="182" height="34" rx="5" fill="#131c2e" stroke="#334155" />
+                  <text x="241" y="176" textAnchor="middle" fill="#ffb3d9" fontSize="8" fontFamily="monospace">
+                    MAGNETIC RAIL BUS · PCIe NVMe
+                  </text>
+                </svg>
+              </div>
+
+              {/* Layer 1: Front Tempered Glass & 7.9" Display */}
+              <div className="sw2-front">
+                {/* Magnetic Connector Bays */}
+                <span className="sw2-mag-bay sw2-mag-bay--left" aria-hidden="true">
+                  <span className="sw2-mag-pin" />
+                  <span className="sw2-mag-pin" />
+                  <span className="sw2-mag-pin" />
+                </span>
+                <span className="sw2-mag-bay sw2-mag-bay--right" aria-hidden="true">
+                  <span className="sw2-mag-pin" />
+                  <span className="sw2-mag-pin" />
+                  <span className="sw2-mag-pin" />
+                </span>
+
+                <div className="sw2-screen" aria-live="polite">
+                  <div className="sw2-screen__stars" aria-hidden="true" />
+                  <div className="sw2-screen__aura" aria-hidden="true" />
+
+                  <div className="sw2-hud-top" aria-hidden="true">
+                    <span className="sw2-hud-pill">
+                      <span className="sw2-hud-dot" />
+                      KIRBY OS
+                    </span>
+                    <span>{cutaway ? "CUTAWAY 3D" : bothDetached ? "JOY-CONS SOLTOS" : "SWITCH 2 · 120Hz"}</span>
+                  </div>
+
+                  <div className="sw2-screen__creature">
+                    <span className="sw2-screen__home" data-guide-stop="" data-guide-home="" aria-hidden="true">
+                      <Creature size={156} mood={awake ? "watching" : "resting"} paused={away} />
+                    </span>
+                  </div>
+
+                  <div className="sw2-screen__brb" aria-hidden="true">
+                    KIRBY EM CAMPO
+                  </div>
+
+                  <div className="sw2-hud-bot" aria-hidden="true">
+                    <span>L: {leftDetached ? "MAG-FREE" : "LOCKED"}</span>
+                    <span>R: {rightDetached ? "MAG-FREE" : "LOCKED"}</span>
+                  </div>
+
+                  <div className="sw2-glass" aria-hidden="true" />
+                </div>
+
+                {/* Cutaway Floating Engineering Callouts */}
+                <span className="sw2-callout sw2-callout--screen" aria-hidden="true">
+                  01 · 7.9&quot; 120Hz GLASS DISPLAY
+                </span>
+                <span className="sw2-callout sw2-callout--soc" aria-hidden="true">
+                  02 · TEGRA T239 PCB · VAPOR FAN · MAG-RAILS
+                </span>
+              </div>
+            </div>
+
+            {/* RIGHT JOY-CON 2 (Magnetic Coral) */}
+            <button
+              type="button"
+              className="sw2-joycon sw2-joycon--right"
+              data-detached={rightDetached ? "true" : "false"}
+              onClick={() => setRightDetached((v) => !v)}
+              aria-pressed={rightDetached}
+              aria-label={rightDetached ? "Encaixar Joy-Con Direito" : "Destacar Joy-Con Direito"}
+              title="Clique para destacar/encaixar Joy-Con R"
+            >
+              <span className="sw2-trigger" aria-hidden="true" />
+              <span className="sw2-rail-glow" aria-hidden="true" />
+              <span className="sw2-joycon__body">
+                <span className="sw2-plus" aria-hidden="true" />
+                <span className="sw2-diamond" aria-hidden="true">
+                  <span className="sw2-btn sw2-btn--n">X</span>
+                  <span className="sw2-btn sw2-btn--w">Y</span>
+                  <span className="sw2-btn sw2-btn--e">A</span>
+                  <span className="sw2-btn sw2-btn--s">B</span>
+                </span>
+                <span className="sw2-stick sw2-stick--coral" aria-hidden="true">
+                  <span className="sw2-stick__cap" />
+                </span>
+                <span className="sw2-sub-btns" aria-hidden="true">
+                  <span className="sw2-home-btn">⌂</span>
+                  <span className="sw2-c-btn">C</span>
+                </span>
+              </span>
+            </button>
+          </div>
+        </div>
+
+        <div ref={shadow} className="sw2-shadow" aria-hidden="true" />
+      </div>
+
+      {/* Interactive Cutaway 3D & Joy-Con Controls */}
+      <div className="sw2-controls" role="group" aria-label="Controles do Nintendo Switch 2 3D">
+        <button type="button" className="sw2-ctrl" aria-pressed={bothDetached} onClick={toggleBothJoyCons}>
+          <span className="sw2-ctrl__dot sw2-ctrl__dot--cyan" aria-hidden="true" />
+          {bothDetached ? "Encaixar Joy-Cons" : "Destacar Joy-Cons"}
+        </button>
+        <button type="button" className="sw2-ctrl" aria-pressed={cutaway} onClick={() => setCutaway((v) => !v)}>
+          <span className="sw2-ctrl__dot" aria-hidden="true" />
+          {cutaway ? "Fechar Cutaway 3D" : "Abrir Cutaway 3D"}
+        </button>
+        <button type="button" className="sw2-ctrl" aria-pressed={!awake} onClick={() => setAwake((v) => !v)}>
+          {awake ? "Kirby: Acordado" : "Kirby: Soneca"}
+        </button>
+      </div>
+    </div>
+  );
+}
