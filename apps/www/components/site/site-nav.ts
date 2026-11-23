@@ -53,9 +53,9 @@ export const TOP_NAV: readonly NavLink[] = [
 
 /** The bar on the GothamOS landing page. */
 export const LANDING_NAV: readonly NavLink[] = [
-  { href: "/#fluxo", label: "Fluxo Operacional" },
   { href: "/#agentes", label: "Time de Agentes" },
   { href: "/#instalacao", label: "Local & Cloud" },
+  { href: "/#comando", label: "Console Tátil" },
   { href: "/#fundador", label: "Zack Studios" },
 ];
 

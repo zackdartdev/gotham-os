@@ -1,7 +1,28 @@
 "use client";
 
-import { useEffect, useRef, useState, type ReactNode } from "react";
-import { AnimatePresence, motion, useScroll, useTransform } from "motion/react";
+/**
+ * The hero: a rounded card that is the whole first screen.
+ *
+ * The nav is part of the card, laid out the way a product's is: the wordmark
+ * on the left, the links in the middle; GitHub (once the repository is
+ * public), X and Support on the right (NavTools.tsx). The site's own top bar stays out of the way until the card has
+ * scrolled past (landing.css, `data-hero-passed`), and on a phone the card
+ * leaves navigation to it.
+ *
+ * In the card: the brand's device, upright and floating a little, over a
+ * faded grid, with DESIGN and SYSTEM right up against it on either side (what
+ * makes Echo different: one design system, every component from the same
+ * material), and the small words that finish the sentence: "The" over DESIGN,
+ * "your AI agent builds with." under SYSTEM. The big words keep their balance;
+ * read in order, the hero says who Echo is for. Then what it is, at the bottom
+ * left, as wide as the two ways in under it: the plugin (Echo's listing in
+ * ChatGPT, nothing to install) and the one command (in your code).
+ *
+ * The device is the brand's own (brand/Device.tsx), with its real keys, and
+ * you can turn it over (DeviceSpinner). Echo lives on its screen; scroll, and
+ * Echo steps out and comes down the page with you.
+ */
+import { useEffect, useRef, type ReactNode } from "react";
 import { HardwareButton } from "@registry/echo/hardware-button";
 import { Switch2Cutaway3D } from "@/components/home/Switch2Cutaway3D";
 import { NavTools } from "@/components/home/NavTools";
@@ -12,18 +33,10 @@ import { HeroLight } from "@/components/home/light/HeroLight";
 const INIT = "gotham-ctl deploy --mode=on-prem|cloud";
 
 const LINKS = [
-  { href: "#fluxo", label: "Fluxo Operacional" },
   { href: "#agentes", label: "Time de Agentes" },
-  { href: "#instalacao", label: "Local & Cloud" },
+  { href: "#instalacao", label: "Instalação Local & Cloud" },
+  { href: "#comando", label: "Console Tátil" },
   { href: "#fundador", label: "Zack Studios" },
-];
-
-const ROTATING_PHRASES = [
-  "soberania 100% local (on-premise)",
-  "time de agentes autônomos sob medida",
-  "nuvem privada (VPC) com zero vazamento",
-  "auditoria imutável & compliance LGPD",
-  "decisão executiva em tempo real",
 ];
 
 function Icon({ children, fill = false }: { children: ReactNode; fill?: boolean }) {
@@ -47,12 +60,7 @@ function Icon({ children, fill = false }: { children: ReactNode; fill?: boolean 
 function Command() {
   const { copied, copy } = useCopy();
   return (
-    <button
-      type="button"
-      className="hero4__cmd"
-      onClick={() => copy(INIT)}
-      aria-label={copied ? "Copiado" : `Copiar comando: ${INIT}`}
-    >
+    <button type="button" className="hero4__cmd" onClick={() => copy(INIT)} aria-label={copied ? "Copied" : `Copy the command: ${INIT}`}>
       <span className="hero4__cmd-prompt" aria-hidden="true">
         $
       </span>
@@ -73,35 +81,20 @@ function Command() {
   );
 }
 
+
 export function HomeHero({
   away = false,
 }: {
-  /** Agent is out on the page, not on the device's screen. */
+  /** Echo is out on the page, not on the device's screen. */
   away?: boolean;
 }) {
   const card = useRef<HTMLElement>(null);
-  const [phraseIdx, setPhraseIdx] = useState(0);
 
-  // Scroll-reactive typography transforms
-  const { scrollYProgress } = useScroll({
-    target: card,
-    offset: ["start start", "end start"],
-  });
-  const leftWordX = useTransform(scrollYProgress, [0, 1], [0, -72]);
-  const rightWordX = useTransform(scrollYProgress, [0, 1], [0, 72]);
-  const wordsOpacity = useTransform(scrollYProgress, [0, 0.85], [1, 0.22]);
-  const offerY = useTransform(scrollYProgress, [0, 1], [0, -28]);
-  const offerOpacity = useTransform(scrollYProgress, [0, 0.9], [1, 0.45]);
-
-  // Rotating highlighted phrase cycle
-  useEffect(() => {
-    const id = window.setInterval(() => {
-      setPhraseIdx((i) => (i + 1) % ROTATING_PHRASES.length);
-    }, 3200);
-    return () => window.clearInterval(id);
-  }, []);
-
-  // Sticky top bar reveal once hero scrolls past
+  /*
+   * The site's own top bar comes back once the card (and its nav) has scrolled away: its foot above the
+   * top 72px, or its top below the window. Measured from the scroll, not with an IntersectionObserver:
+   * under a heavy load a browser can hold an observer's notices back for seconds, and the bar stayed away.
+   */
   useEffect(() => {
     const el = card.current;
     if (!el) return;
@@ -132,6 +125,7 @@ export function HomeHero({
       <div className="hero4__grid" aria-hidden="true" />
 
       <header className="hero4__nav">
+        {/* Whose page this is, where every visitor looks first: the top-left corner. */}
         <span className="hero4__brand">
           <Wordmark />
         </span>
@@ -150,66 +144,33 @@ export function HomeHero({
         </div>
       </header>
 
+      {/* The words beside the device say it on the screen; the heading says it to everyone else. */}
       <h1 id="hero-h" className="hero4__sr">
         GothamOS: Inteligência operacional e time de agentes corporativos, 100% local ou em nuvem privada
       </h1>
 
       <div className="hero4__device hero4__device--switch2">
-        <motion.span
-          className="hero4__small hero4__small--before"
-          aria-hidden="true"
-          style={{ x: leftWordX, opacity: wordsOpacity }}
-        >
-          Camada Executiva Soberana
-        </motion.span>
-        <motion.span
-          className="hero4__word hero4__word--left"
-          aria-hidden="true"
-          style={{ x: leftWordX, opacity: wordsOpacity }}
-        >
-          GOTHAM
-        </motion.span>
-        <motion.span
-          className="hero4__word hero4__word--right"
-          aria-hidden="true"
-          style={{ x: rightWordX, opacity: wordsOpacity }}
-        >
-          OS
-        </motion.span>
-        <motion.span
-          className="hero4__small hero4__small--after"
-          aria-hidden="true"
-          style={{ x: rightWordX, opacity: wordsOpacity }}
-        >
-          arquitetura multi-agente corporativa
-        </motion.span>
+        <span className="hero4__small hero4__small--before" aria-hidden="true">
+          Kirby Edition · Cutaway 3D
+        </span>
+        <span className="hero4__word hero4__word--left" aria-hidden="true">
+          SWITCH
+        </span>
+        <span className="hero4__word hero4__word--right" aria-hidden="true">
+          2
+        </span>
+        <span className="hero4__small hero4__small--after" aria-hidden="true">
+          joy-cons magnéticos destacáveis
+        </span>
         <Switch2Cutaway3D away={away} />
       </div>
 
-      <motion.div className="hero4__offer" style={{ y: offerY, opacity: offerOpacity }}>
-        <div className="hero4__rotator" aria-live="polite">
-          <span className="hero4__rotator-lead">Inteligência operacional no padrão Palantir Gotham com</span>
-          <span className="hero4__rotator-slot">
-            <AnimatePresence mode="wait">
-              <motion.span
-                key={ROTATING_PHRASES[phraseIdx]}
-                className="hero4__rotator-highlight"
-                initial={{ opacity: 0, y: 12, filter: "blur(6px)" }}
-                animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-                exit={{ opacity: 0, y: -12, filter: "blur(6px)" }}
-                transition={{ duration: 0.42, ease: [0.22, 1, 0.36, 1] }}
-              >
-                {ROTATING_PHRASES[phraseIdx]}
-              </motion.span>
-            </AnimatePresence>
-          </span>
-        </div>
-
+      <div className="hero4__offer">
         <p className="hero4__lede">
-          Implantamos a plataforma completa e operamos squads de agentes conectados aos seus ERPs, bancos de dados e
-          fluxos críticos — com controle total sobre dados e custos.
+          Inteligência operacional no padrão Palantir Gotham: implantamos a plataforma 100% local{" "}
+          <span style={{ whiteSpace: "nowrap" }}>(on-premise)</span> ou em nuvem privada (VPC) junto com squads de
+          agentes sob medida para a sua operação.
         </p>
-
         <div className="hero4__ctas">
           <HardwareButton
             variant="primary"
@@ -221,7 +182,7 @@ export function HomeHero({
           </HardwareButton>
           <Command />
         </div>
-      </motion.div>
+      </div>
     </section>
   );
 }
